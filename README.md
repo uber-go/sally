@@ -1,2 +1,2 @@
 # sally
-A canonical import path static site generator for golang
+A canonical import path static site generator for Go
