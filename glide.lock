@@ -1,0 +1,10 @@
+hash: 1be7c0cce3ab3f937df2a61f65a95e269580c9cdb44749268d8008b448f44b91
+updated: 2016-08-07T15:11:17.692396688-07:00
+imports:
+- name: github.com/jteeuwen/go-bindata
+  version: bbd0c6e271208dce66d8fda4bc536453cd27fc4a
+  subpackages:
+  - '...'
+- name: gopkg.in/yaml.v2
+  version: e4d366fc3c7938e2958e662b4258c7a89e1f0e3e
+testImports: []
