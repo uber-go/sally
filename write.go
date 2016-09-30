@@ -53,17 +53,17 @@ func writeIndex(c Config, outDir string) error {
 	return nil
 }
 
-type packageMeta struct {
+type packageTpl struct {
 	url  string
 	name string
 	Package
 }
 
-func (p packageMeta) CanonicalURL() string {
+func (p packageTpl) CanonicalURL() string {
 	return fmt.Sprintf("%s/%s", p.url, p.name)
 }
 
-func (p packageMeta) GodocURL() string {
+func (p packageTpl) GodocURL() string {
 	return fmt.Sprintf("https://godoc.org/%s", p.CanonicalURL())
 }
 
@@ -79,7 +79,7 @@ func writePackages(c Config, outDir string) error {
 	}
 
 	for name, pkg := range c.Packages {
-		tpl := packageMeta{
+		tpl := packageTpl{
 			url:     c.URL,
 			name:    name,
 			Package: pkg,
