@@ -17,8 +17,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = Write(c, *dir)
-	if err != nil {
+	if err := Write(c, *dir); err != nil {
 		log.Fatal(err)
 	}
 }

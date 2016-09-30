@@ -84,8 +84,7 @@ func writePackages(c Config, outDir string) error {
 			return err
 		}
 
-		err = ioutil.WriteFile(fmt.Sprintf("%s/%s.html", outDir, name), buf.Bytes(), 0644)
-		if err != nil {
+		if err := ioutil.WriteFile(fmt.Sprintf("%s/%s.html", outDir, name), buf.Bytes(), 0644); err != nil {
 			return err
 		}
 

@@ -19,15 +19,14 @@ type Package struct {
 
 // Parse takes a path to a yaml file and produces a parsed Config
 func Parse(path string) (Config, error) {
-	c := Config{}
+	var c Config
 
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		return c, err
 	}
 
-	err = yaml.Unmarshal(data, &c)
-	if err != nil {
+	if err := yaml.Unmarshal(data, &c); err != nil {
 		return c, err
 	}
 
