@@ -14,7 +14,7 @@ type Config struct {
 
 // Package details the options available for each repo
 type Package struct {
-	Repo string `yaml: "repo"`
+	Repo string `yaml:"repo"`
 }
 
 // Parse takes a path to a yaml file and produces a parsed Config
