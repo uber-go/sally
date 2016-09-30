@@ -8,13 +8,13 @@ import (
 
 // Config represents the structure of the yaml file
 type Config struct {
-	URL      string
-	Packages map[string]Package
+	URL      string             `yaml:"url"`
+	Packages map[string]Package `yaml:"packages"`
 }
 
 // Package details the options available for each repo
 type Package struct {
-	Repo string
+	Repo string `yaml: "repo"`
 }
 
 // Parse takes a path to a yaml file and produces a parsed Config
