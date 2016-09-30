@@ -42,8 +42,7 @@ func writeIndex(c Config, outDir string) error {
 	}
 
 	buf := new(bytes.Buffer)
-	err = t.Execute(buf, c)
-	if err != nil {
+	if err := t.Execute(buf, c); err != nil {
 		return err
 	}
 
