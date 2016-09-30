@@ -10,14 +10,14 @@ import (
 
 // Config represents the structure of the yaml file
 type Config struct {
-	URL      string
-	Packages map[string]Package
+	URL      string             `yaml:"url"`
+	Packages map[string]Package `yaml:"packages"`
 }
 
 // Package details the options available for each repo
 type Package struct {
-	Repo    string
-	Private bool
+	Repo    string `yaml:"repo"`
+	Private bool   `yaml:"private"`
 }
 
 var _privateGHReplacer = strings.NewReplacer("github.com/", "")
@@ -44,15 +44,14 @@ func (p Package) PublicURL() string {
 
 // Parse takes a path to a yaml file and produces a parsed Config
 func Parse(path string) (Config, error) {
-	c := Config{}
+	var c Config
 
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		return c, err
 	}
 
-	err = yaml.Unmarshal(data, &c)
-	if err != nil {
+	if err := yaml.Unmarshal(data, &c); err != nil {
 		return c, err
 	}
 

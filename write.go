@@ -6,13 +6,11 @@ import (
 	"html/template"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 const (
-	indexTpl     = "index.tpl"
-	indexTplPath = "templates/index.tpl"
-
-	packagesTpl     = "package.tpl"
+	indexTplPath    = "templates/index.tpl"
 	packagesTplPath = "templates/package.tpl"
 )
 
@@ -36,14 +34,13 @@ func writeIndex(c Config, outDir string) error {
 		return err
 	}
 
-	t, err := template.New(indexTpl).Parse(string(tpl))
+	t, err := template.New(filepath.Base(indexTplPath)).Parse(string(tpl))
 	if err != nil {
 		return err
 	}
 
 	buf := new(bytes.Buffer)
-	err = t.Execute(buf, c)
-	if err != nil {
+	if err := t.Execute(buf, c); err != nil {
 		return err
 	}
 
@@ -66,13 +63,17 @@ func (p packageMeta) CanonicalURL() string {
 	return fmt.Sprintf("%s/%s", p.url, p.name)
 }
 
+func (p packageMeta) GodocURL() string {
+	return fmt.Sprintf("https://godoc.org/%s", p.CanonicalURL())
+}
+
 func writePackages(c Config, outDir string) error {
 	tpl, err := Asset(packagesTplPath)
 	if err != nil {
 		return err
 	}
 
-	t, err := template.New(packagesTpl).Parse(string(tpl))
+	t, err := template.New(filepath.Base(packagesTplPath)).Parse(string(tpl))
 	if err != nil {
 		return err
 	}
@@ -85,13 +86,11 @@ func writePackages(c Config, outDir string) error {
 		}
 
 		buf := new(bytes.Buffer)
-		err = t.Execute(buf, tpl)
-		if err != nil {
+		if err := t.Execute(buf, tpl); err != nil {
 			return err
 		}
 
-		err = ioutil.WriteFile(fmt.Sprintf("%s/%s.html", outDir, name), buf.Bytes(), 0644)
-		if err != nil {
+		if err := ioutil.WriteFile(fmt.Sprintf("%s/%s.html", outDir, name), buf.Bytes(), 0644); err != nil {
 			return err
 		}
 

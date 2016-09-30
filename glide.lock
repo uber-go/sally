@@ -1,10 +1,19 @@
-hash: ff8c4e8d2a68a6a433e836e11846d9b3f543f3efe46292a4d838a9bb61980626
-updated: 2016-09-30T09:43:07.033523659-07:00
+hash: 02f42b7d673967fb02cedffef02f77adf96837e18f124569f1cbd97158bedddb
+updated: 2016-09-30T16:04:10.922446727-07:00
 imports:
+- name: gopkg.in/yaml.v2
+  version: a5b47d31c556af34a302ce5d659e6fea44d90de0
+testImports:
+- name: github.com/davecgh/go-spew
+  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
+  subpackages:
+  - spew
+- name: github.com/pmezard/go-difflib
+  version: 792786c7400a136282c1664665ae0a8db921c6c2
+  subpackages:
+  - difflib
 - name: github.com/stretchr/testify
   version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
   subpackages:
+  - assert
   - require
-- name: gopkg.in/yaml.v2
-  version: a5b47d31c556af34a302ce5d659e6fea44d90de0
-devImports: []
