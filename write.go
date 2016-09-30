@@ -67,13 +67,16 @@ func writePackages(c Config, outDir string) error {
 	}
 
 	for name, pkg := range c.Packages {
+		canonicalURL := fmt.Sprintf("%s/%s", c.URL, name)
 		tpl := struct {
-			CanonicalURL string
 			Name         string
+			CanonicalURL string
+			GodocURL     string
 			Package
 		}{
-			CanonicalURL: fmt.Sprintf("%s/%s", c.URL, name),
 			Name:         name,
+			CanonicalURL: canonicalURL,
+			GodocURL:     fmt.Sprintf("https://godoc.org/%s", canonicalURL),
 			Package:      pkg,
 		}
 
