@@ -53,6 +53,20 @@ func writeIndex(c Config, outDir string) error {
 	return nil
 }
 
+type packageTpl struct {
+	url  string
+	name string
+	Package
+}
+
+func (p packageTpl) CanonicalURL() string {
+	return fmt.Sprintf("%s/%s", p.url, p.name)
+}
+
+func (p packageTpl) GodocURL() string {
+	return fmt.Sprintf("https://godoc.org/%s", p.CanonicalURL())
+}
+
 func writePackages(c Config, outDir string) error {
 	tpl, err := Asset(packagesTplPath)
 	if err != nil {
@@ -65,17 +79,10 @@ func writePackages(c Config, outDir string) error {
 	}
 
 	for name, pkg := range c.Packages {
-		canonicalURL := fmt.Sprintf("%s/%s", c.URL, name)
-		tpl := struct {
-			Name         string
-			CanonicalURL string
-			GodocURL     string
-			Package
-		}{
-			Name:         name,
-			CanonicalURL: canonicalURL,
-			GodocURL:     fmt.Sprintf("https://godoc.org/%s", canonicalURL),
-			Package:      pkg,
+		tpl := packageTpl{
+			url:     c.URL,
+			name:    name,
+			Package: pkg,
 		}
 
 		buf := new(bytes.Buffer)
