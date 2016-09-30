@@ -84,7 +84,7 @@ func templatesIndexTpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "templates/index.tpl", size: 161, mode: os.FileMode(420), modTime: time.Unix(1470608150, 0)}
+	info := bindataFileInfo{name: "templates/index.tpl", size: 161, mode: os.FileMode(420), modTime: time.Unix(1475274933, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -104,7 +104,7 @@ func templatesPackageTpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "templates/package.tpl", size: 483, mode: os.FileMode(420), modTime: time.Unix(1475273244, 0)}
+	info := bindataFileInfo{name: "templates/package.tpl", size: 483, mode: os.FileMode(420), modTime: time.Unix(1475274933, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
