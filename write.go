@@ -78,8 +78,7 @@ func writePackages(c Config, outDir string) error {
 		}
 
 		buf := new(bytes.Buffer)
-		err = t.Execute(buf, tpl)
-		if err != nil {
+		if err := t.Execute(buf, tpl); err != nil {
 			return err
 		}
 
