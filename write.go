@@ -6,13 +6,11 @@ import (
 	"html/template"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 const (
-	indexTpl     = "index.tpl"
-	indexTplPath = "templates/index.tpl"
-
-	packagesTpl     = "package.tpl"
+	indexTplPath    = "templates/index.tpl"
 	packagesTplPath = "templates/package.tpl"
 )
 
@@ -36,7 +34,7 @@ func writeIndex(c Config, outDir string) error {
 		return err
 	}
 
-	t, err := template.New(indexTpl).Parse(string(tpl))
+	t, err := template.New(filepath.Base(indexTplPath)).Parse(string(tpl))
 	if err != nil {
 		return err
 	}
@@ -61,7 +59,7 @@ func writePackages(c Config, outDir string) error {
 		return err
 	}
 
-	t, err := template.New(packagesTpl).Parse(string(tpl))
+	t, err := template.New(filepath.Base(packagesTplPath)).Parse(string(tpl))
 	if err != nil {
 		return err
 	}
