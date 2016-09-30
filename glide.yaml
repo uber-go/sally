@@ -1,0 +1,3 @@
+package: github.com/uber-go/sally
+import:
+- package: gopkg.in/yaml.v2
