@@ -7,4 +7,4 @@ install:
 
 .PHONY: run
 run:
-	go install . && sally
+	go generate && go build && ./sally

@@ -7,3 +7,6 @@ packages:
     repo: github.com/thriftrw/thriftrw-go
   yarpc:
     repo: github.com/yarpc/yarpc-go
+  fx:
+    repo: github.com/uber-go/uberfx
+    private: true

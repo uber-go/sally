@@ -56,6 +56,16 @@ func writeIndex(c Config, outDir string) error {
 	return nil
 }
 
+type packageMeta struct {
+	url  string
+	name string
+	Package
+}
+
+func (p packageMeta) CanonicalURL() string {
+	return fmt.Sprintf("%s/%s", p.url, p.name)
+}
+
 func writePackages(c Config, outDir string) error {
 	tpl, err := Asset(packagesTplPath)
 	if err != nil {
@@ -68,14 +78,10 @@ func writePackages(c Config, outDir string) error {
 	}
 
 	for name, pkg := range c.Packages {
-		tpl := struct {
-			CanonicalURL string
-			Name         string
-			Package
-		}{
-			CanonicalURL: fmt.Sprintf("%s/%s", c.URL, name),
-			Name:         name,
-			Package:      pkg,
+		tpl := packageMeta{
+			url:     c.URL,
+			name:    name,
+			Package: pkg,
 		}
 
 		buf := new(bytes.Buffer)
