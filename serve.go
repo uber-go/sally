@@ -8,7 +8,7 @@ import (
 )
 
 // Serve starts the HTTP server
-func Serve(config Config) error {
+func Serve(port int, config Config) error {
 	router := httprouter.New()
 	router.RedirectTrailingSlash = false
 
@@ -20,8 +20,7 @@ func Serve(config Config) error {
 		router.GET(fmt.Sprintf("/%s/*name", name), h)
 	}
 
-	// TODO port should be cli opt
-	if err := http.ListenAndServe(":8080", router); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), router); err != nil {
 		return err
 	}
 

@@ -14,7 +14,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := Serve(config); err != nil {
+	if err := Serve(8080, config); err != nil {
 		log.Fatal(err)
 	}
 
