@@ -20,7 +20,11 @@ func ListenAndServe(port int, config Config) error {
 	router.GET("/", handle)
 
 	for name, p := range config.Packages {
-		handle, err := pkg(p)
+		handle, err := pkg(pkgViewModel{
+			Package: p,
+			Name:    name,
+			Config:  config,
+		})
 		if err != nil {
 			return err
 		}
@@ -47,14 +51,40 @@ func index(config Config) (httprouter.Handle, error) {
 	}, nil
 }
 
-func pkg(pkg Package) (httprouter.Handle, error) {
+func pkg(p pkgViewModel) (httprouter.Handle, error) {
 	t, err := template.New("package").Parse(`
-<h1>Package</h1>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="go-import" content="{{ .CanonicalURL }} git https://{{ .Repo }}">
+        <meta name="go-source" content="{{ .CanonicalURL }} https://{{ .Repo }} https://{{ .Repo }}/tree/master{/dir} https://{{ .Repo }}/tree/master{/dir}/{file}#L{line}">
+        <meta http-equiv="refresh" content="0; url={{ .GodocURL }}">
+    </head>
+    <body>
+        Nothing to see here. Please <a href="{{ .GodocURL }}">move along</a>.
+    </body>
+</html>
 `)
 	if err != nil {
 		return nil, err
 	}
-	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		t.Execute(w, pkg)
+
+	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		t.Execute(w, p)
 	}, nil
+}
+
+type pkgViewModel struct {
+	Package
+
+	Name   string
+	Config Config
+}
+
+func (p pkgViewModel) CanonicalURL() string {
+	return fmt.Sprintf("%s/%s", p.Config.URL, p.Name)
+}
+
+func (p pkgViewModel) GodocURL() string {
+	return fmt.Sprintf("https://godoc.org/%s", p.CanonicalURL())
 }
