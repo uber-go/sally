@@ -15,9 +15,9 @@ func ListenAndServe(port int, config Config) error {
 	router.GET("/", index(config))
 
 	for name, p := range config.Packages {
-		h := pkg(p)
-		router.GET(fmt.Sprintf("/%s", name), h)
-		router.GET(fmt.Sprintf("/%s/*name", name), h)
+		handle := pkg(p)
+		router.GET(fmt.Sprintf("/%s", name), handle)
+		router.GET(fmt.Sprintf("/%s/*name", name), handle)
 	}
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), router); err != nil {
