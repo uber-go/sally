@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -12,10 +13,17 @@ func ListenAndServe(port int, config Config) error {
 	router := httprouter.New()
 	router.RedirectTrailingSlash = false
 
-	router.GET("/", index(config))
+	handle, err := index(config)
+	if err != nil {
+		return err
+	}
+	router.GET("/", handle)
 
 	for name, p := range config.Packages {
-		handle := pkg(p)
+		handle, err := pkg(p)
+		if err != nil {
+			return err
+		}
 		router.GET(fmt.Sprintf("/%s", name), handle)
 		router.GET(fmt.Sprintf("/%s/*name", name), handle)
 	}
@@ -27,14 +35,26 @@ func ListenAndServe(port int, config Config) error {
 	return nil
 }
 
-func index(config Config) httprouter.Handle {
-	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		fmt.Fprint(w, "Welcome!\n")
+func index(config Config) (httprouter.Handle, error) {
+	t, err := template.New("index").Parse(`
+<h1>Hello World</h1>
+`)
+	if err != nil {
+		return nil, err
 	}
+	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		t.Execute(w, config)
+	}, nil
 }
 
-func pkg(pkg Package) httprouter.Handle {
-	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		fmt.Fprintf(w, "hello, %s!\n", ps.ByName("name"))
+func pkg(pkg Package) (httprouter.Handle, error) {
+	t, err := template.New("package").Parse(`
+<h1>Package</h1>
+`)
+	if err != nil {
+		return nil, err
 	}
+	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+		t.Execute(w, pkg)
+	}, nil
 }
