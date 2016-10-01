@@ -99,6 +99,9 @@ func (p pkgViewModel) GodocURL() string {
 }
 
 func (p pkgViewModel) NewWithAddlURL(uri string) pkgViewModel {
+	if uri == "" {
+		return p
+	}
 	return pkgViewModel{
 		Package: p.Package,
 		Name:    p.Name,
