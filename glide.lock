@@ -1,6 +1,8 @@
-hash: 733b6e3d1ba3612c5d43aca4fe2243be4f39f09d609221d841d2eea1d8a060ad
-updated: 2016-08-07T15:19:06.856947619-07:00
+hash: 33f6b44b886b66ee62a98c0b49369d593e1cc9d812cfbe09687e8653a8b9b250
+updated: 2016-10-01T14:30:40.946114602-07:00
 imports:
+- name: github.com/julienschmidt/httprouter
+  version: 8c199fb6259ffc1af525cc3ad52ee60ba8359669
 - name: gopkg.in/yaml.v2
-  version: e4d366fc3c7938e2958e662b4258c7a89e1f0e3e
+  version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 testImports: []
