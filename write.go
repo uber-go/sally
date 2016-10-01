@@ -29,12 +29,7 @@ func Write(c Config, outDir string) error {
 }
 
 func writeIndex(c Config, outDir string) error {
-	tpl, err := Asset(indexTplPath)
-	if err != nil {
-		return err
-	}
-
-	t, err := template.New(filepath.Base(indexTplPath)).Parse(string(tpl))
+	t, err := template.New(filepath.Base(indexTplPath)).Parse("Some Template")
 	if err != nil {
 		return err
 	}
@@ -54,12 +49,7 @@ func writeIndex(c Config, outDir string) error {
 }
 
 func writePackages(c Config, outDir string) error {
-	tpl, err := Asset(packagesTplPath)
-	if err != nil {
-		return err
-	}
-
-	t, err := template.New(filepath.Base(packagesTplPath)).Parse(string(tpl))
+	t, err := template.New(filepath.Base(packagesTplPath)).Parse("Some Template")
 	if err != nil {
 		return err
 	}
