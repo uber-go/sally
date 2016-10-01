@@ -7,8 +7,8 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// Serve starts the HTTP server
-func Serve(port int, config Config) error {
+// ListenAndServe starts a Sally server
+func ListenAndServe(port int, config Config) error {
 	router := httprouter.New()
 	router.RedirectTrailingSlash = false
 
