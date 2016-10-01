@@ -7,6 +7,7 @@ import (
 
 func main() {
 	yml := flag.String("yml", "sally.yaml", "yaml file to read config from")
+	port := flag.Int("port", 8080, "port to listen and serve on")
 	flag.Parse()
 
 	config, err := Parse(*yml)
@@ -14,7 +15,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := ListenAndServe(8080, config); err != nil {
+	if err := ListenAndServe(*port, config); err != nil {
 		log.Fatal(err)
 	}
 
