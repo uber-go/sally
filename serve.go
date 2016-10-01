@@ -41,7 +41,16 @@ func ListenAndServe(port int, config Config) error {
 
 func index(config Config) (httprouter.Handle, error) {
 	t, err := template.New("index").Parse(`
-<h1>Hello World</h1>
+<!DOCTYPE html>
+<html>
+	<body>
+		<ul>
+			{{ range $key, $value := .Packages }}
+				<li>{{ $key }} - {{ $value.Repo }}</li>
+			{{ end }}
+		</ul>
+	</body>
+</html>
 `)
 	if err != nil {
 		return nil, err
