@@ -13,14 +13,14 @@ func ListenAndServe(port int, config Config) error {
 	router := httprouter.New()
 	router.RedirectTrailingSlash = false
 
-	handle, err := index(config)
+	handle, err := createIndexHandle(config)
 	if err != nil {
 		return err
 	}
 	router.GET("/", handle)
 
 	for name, p := range config.Packages {
-		handle, err := pkg(pkgViewModel{
+		handle, err := createPackageHandle(pkgViewModel{
 			Package: p,
 			Name:    name,
 			Config:  config,
@@ -29,7 +29,7 @@ func ListenAndServe(port int, config Config) error {
 			return err
 		}
 		router.GET(fmt.Sprintf("/%s", name), handle)
-		router.GET(fmt.Sprintf("/%s/*name", name), handle)
+		router.GET(fmt.Sprintf("/%s/*path", name), handle)
 	}
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), router); err != nil {
@@ -39,7 +39,7 @@ func ListenAndServe(port int, config Config) error {
 	return nil
 }
 
-func index(config Config) (httprouter.Handle, error) {
+func createIndexHandle(config Config) (httprouter.Handle, error) {
 	t, err := template.New("index").Parse(`
 <!DOCTYPE html>
 <html>
@@ -60,7 +60,7 @@ func index(config Config) (httprouter.Handle, error) {
 	}, nil
 }
 
-func pkg(p pkgViewModel) (httprouter.Handle, error) {
+func createPackageHandle(pvm pkgViewModel) (httprouter.Handle, error) {
 	t, err := template.New("package").Parse(`
 <!DOCTYPE html>
 <html>
@@ -77,17 +77,17 @@ func pkg(p pkgViewModel) (httprouter.Handle, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		t.Execute(w, p)
+	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+		t.Execute(w, pvm.NewWithAddlURL(ps.ByName("path")))
 	}, nil
 }
 
 type pkgViewModel struct {
 	Package
 
-	Name   string
-	Config Config
+	Name    string
+	Config  Config
+	AddlURI string
 }
 
 func (p pkgViewModel) CanonicalURL() string {
@@ -95,5 +95,14 @@ func (p pkgViewModel) CanonicalURL() string {
 }
 
 func (p pkgViewModel) GodocURL() string {
-	return fmt.Sprintf("https://godoc.org/%s", p.CanonicalURL())
+	return fmt.Sprintf("https://godoc.org/%s%s", p.CanonicalURL(), p.AddlURI)
+}
+
+func (p pkgViewModel) NewWithAddlURL(uri string) pkgViewModel {
+	return pkgViewModel{
+		Package: p.Package,
+		Name:    p.Name,
+		Config:  p.Config,
+		AddlURI: uri,
+	}
 }
