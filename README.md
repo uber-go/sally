@@ -1,6 +1,6 @@
 # sally
 
-A canonical import path static site generator for Go
+A tiny HTTP server for supporting custom Golang import paths
 
 ## Installation
 
