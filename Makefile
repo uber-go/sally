@@ -4,8 +4,14 @@ install:
 	glide install
 
 
+.PHONY: lint
+lint:
+	go vet .
+	golint .
+
+
 .PHONY: test
-test:
+test: lint
 	go test -race .
 
 
