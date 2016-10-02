@@ -1,11 +1,6 @@
 package main
 
-import (
-	"net/http"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-)
+import "testing"
 
 var config = `
 url: go.uber.org
@@ -18,8 +13,7 @@ packages:
 
 func TestIndex(t *testing.T) {
 	rr := CallAndRecord(t, config, "/")
-	assert.Equal(t, rr.Code, http.StatusOK)
-	AssertResponse(t, rr, `
+	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
   <body>
@@ -34,8 +28,7 @@ func TestIndex(t *testing.T) {
 
 func TestPackageShouldExist(t *testing.T) {
 	rr := CallAndRecord(t, config, "/yarpc")
-	assert.Equal(t, rr.Code, http.StatusOK)
-	AssertResponse(t, rr, `
+	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
     <head>
@@ -52,13 +45,14 @@ func TestPackageShouldExist(t *testing.T) {
 
 func TestNonExistentPackageShould404(t *testing.T) {
 	rr := CallAndRecord(t, config, "/nonexistent")
-	assert.Equal(t, rr.Code, http.StatusNotFound)
+	AssertResponse(t, rr, 404, `
+404 Not found
+`)
 }
 
 func TestTrailingSlash(t *testing.T) {
 	rr := CallAndRecord(t, config, "/yarpc/")
-	assert.Equal(t, rr.Code, http.StatusOK)
-	AssertResponse(t, rr, `
+	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
     <head>
@@ -75,8 +69,7 @@ func TestTrailingSlash(t *testing.T) {
 
 func TestDeepImports(t *testing.T) {
 	rr := CallAndRecord(t, config, "/yarpc/heeheehee")
-	assert.Equal(t, rr.Code, http.StatusOK)
-	AssertResponse(t, rr, `
+	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
     <head>
@@ -91,8 +84,7 @@ func TestDeepImports(t *testing.T) {
 `)
 
 	rr = CallAndRecord(t, config, "/yarpc/heehee/hawhaw")
-	assert.Equal(t, rr.Code, http.StatusOK)
-	AssertResponse(t, rr, `
+	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
     <head>
