@@ -19,9 +19,9 @@ func ListenAndServe(port int, config Config) error {
 	}
 	router.GET("/", handle)
 
-	for name, p := range config.Packages {
+	for name, pkg := range config.Packages {
 		handle, err := createPackageHandle(packageViewModel{
-			Package: p,
+			Package: pkg,
 			Name:    name,
 			Config:  config,
 		})
@@ -78,16 +78,16 @@ func createPackageHandle(pvm packageViewModel) (httprouter.Handle, error) {
 		return nil, err
 	}
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		t.Execute(w, pvm.NewWithAddlURL(ps.ByName("path")))
+		t.Execute(w, pvm.NewWithAddlGodocPath(ps.ByName("path")))
 	}, nil
 }
 
 type packageViewModel struct {
 	Package
 
-	Name    string
-	Config  Config
-	AddlURI string
+	Name          string
+	Config        Config
+	AddlGodocPath string
 }
 
 func (p packageViewModel) CanonicalURL() string {
@@ -95,17 +95,17 @@ func (p packageViewModel) CanonicalURL() string {
 }
 
 func (p packageViewModel) GodocURL() string {
-	return fmt.Sprintf("https://godoc.org/%s%s", p.CanonicalURL(), p.AddlURI)
+	return fmt.Sprintf("https://godoc.org/%s%s", p.CanonicalURL(), p.AddlGodocPath)
 }
 
-func (p packageViewModel) NewWithAddlURL(uri string) packageViewModel {
+func (p packageViewModel) NewWithAddlGodocPath(uri string) packageViewModel {
 	if uri == "" {
 		return p
 	}
 	return packageViewModel{
-		Package: p.Package,
-		Name:    p.Name,
-		Config:  p.Config,
-		AddlURI: uri,
+		Package:       p.Package,
+		Name:          p.Name,
+		Config:        p.Config,
+		AddlGodocPath: uri,
 	}
 }
