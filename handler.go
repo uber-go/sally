@@ -8,8 +8,8 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// GetHandler creates a Sally http.Handler
-func GetHandler(config Config) (http.Handler, error) {
+// CreateHandler creates a Sally http.Handler
+func CreateHandler(config Config) (http.Handler, error) {
 	router := httprouter.New()
 	router.RedirectTrailingSlash = false
 

@@ -28,8 +28,8 @@ func TempFile(t *testing.T, contents string) (path string, clean func()) {
 	}
 }
 
-// GetHandlerFromYAML builds the Sally handler from a yaml config string
-func GetHandlerFromYAML(t *testing.T, content string) (handler http.Handler, clean func()) {
+// CreateHandlerFromYAML builds the Sally handler from a yaml config string
+func CreateHandlerFromYAML(t *testing.T, content string) (handler http.Handler, clean func()) {
 	path, clean := TempFile(t, content)
 
 	config, err := Parse(path)
@@ -37,7 +37,7 @@ func GetHandlerFromYAML(t *testing.T, content string) (handler http.Handler, cle
 		t.Fatal(err)
 	}
 
-	handler, err = GetHandler(config)
+	handler, err = CreateHandler(config)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -47,7 +47,7 @@ func GetHandlerFromYAML(t *testing.T, content string) (handler http.Handler, cle
 
 // CallAndRecord makes a GET request to the Sally handler and returns a response recorder
 func CallAndRecord(t *testing.T, config string, uri string) *httptest.ResponseRecorder {
-	handler, clean := GetHandlerFromYAML(t, config)
+	handler, clean := CreateHandlerFromYAML(t, config)
 	defer clean()
 
 	req, err := http.NewRequest("GET", uri, nil)

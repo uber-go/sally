@@ -19,7 +19,7 @@ func main() {
 	}
 
 	log.Printf("Creating HTTP handler with config: %s", config)
-	handler, err := GetHandler(config)
+	handler, err := CreateHandler(config)
 	if err != nil {
 		log.Fatal(err)
 	}
