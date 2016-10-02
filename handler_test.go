@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/yosssi/gohtml"
 )
 
 var config = `
@@ -20,7 +19,7 @@ packages:
 func TestIndex(t *testing.T) {
 	rr := CallAndRecord(t, config, "/")
 	assert.Equal(t, rr.Code, http.StatusOK)
-	assert.Equal(t, gohtml.Format(rr.Body.String()), gohtml.Format(`
+	AssertHTML(t, rr, `
 <!DOCTYPE html>
 <html>
   <body>
@@ -30,13 +29,13 @@ func TestIndex(t *testing.T) {
     </ul>
   </body>
 </html>
-`))
+`)
 }
 
 func TestPackageShouldExist(t *testing.T) {
 	rr := CallAndRecord(t, config, "/yarpc")
 	assert.Equal(t, rr.Code, http.StatusOK)
-	assert.Equal(t, rr.Body.String(), `
+	AssertHTML(t, rr, `
 <!DOCTYPE html>
 <html>
     <head>
@@ -59,7 +58,7 @@ func TestNonExistentPackageShould404(t *testing.T) {
 func TestTrailingSlash(t *testing.T) {
 	rr := CallAndRecord(t, config, "/yarpc/")
 	assert.Equal(t, rr.Code, http.StatusOK)
-	assert.Equal(t, rr.Body.String(), `
+	AssertHTML(t, rr, `
 <!DOCTYPE html>
 <html>
     <head>
@@ -77,7 +76,7 @@ func TestTrailingSlash(t *testing.T) {
 func TestDeepImports(t *testing.T) {
 	rr := CallAndRecord(t, config, "/yarpc/heeheehee")
 	assert.Equal(t, rr.Code, http.StatusOK)
-	assert.Equal(t, rr.Body.String(), `
+	AssertHTML(t, rr, `
 <!DOCTYPE html>
 <html>
     <head>
@@ -93,7 +92,7 @@ func TestDeepImports(t *testing.T) {
 
 	rr = CallAndRecord(t, config, "/yarpc/heehee/hawhaw")
 	assert.Equal(t, rr.Code, http.StatusOK)
-	assert.Equal(t, rr.Body.String(), `
+	AssertHTML(t, rr, `
 <!DOCTYPE html>
 <html>
     <head>
