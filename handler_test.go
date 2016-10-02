@@ -15,7 +15,7 @@ packages:
 `
 
 func TestPackageShouldExist(t *testing.T) {
-	rr := Record(t, config, "/yarpc")
+	rr := CallAndRecord(t, config, "/yarpc")
 	assert.Equal(t, rr.Code, http.StatusOK)
 	assert.Equal(t, rr.Body.String(), `
 <!DOCTYPE html>
@@ -33,12 +33,12 @@ func TestPackageShouldExist(t *testing.T) {
 }
 
 func TestNonExistentPackageShould404(t *testing.T) {
-	rr := Record(t, config, "/nonexistent")
+	rr := CallAndRecord(t, config, "/nonexistent")
 	assert.Equal(t, rr.Code, http.StatusNotFound)
 }
 
 func TestTrailingSlash(t *testing.T) {
-	rr := Record(t, config, "/yarpc/")
+	rr := CallAndRecord(t, config, "/yarpc/")
 	assert.Equal(t, rr.Code, http.StatusOK)
 	assert.Equal(t, rr.Body.String(), `
 <!DOCTYPE html>
@@ -56,7 +56,7 @@ func TestTrailingSlash(t *testing.T) {
 }
 
 func TestDeepImports(t *testing.T) {
-	rr := Record(t, config, "/yarpc/heeheehee")
+	rr := CallAndRecord(t, config, "/yarpc/heeheehee")
 	assert.Equal(t, rr.Code, http.StatusOK)
 	assert.Equal(t, rr.Body.String(), `
 <!DOCTYPE html>
@@ -72,7 +72,7 @@ func TestDeepImports(t *testing.T) {
 </html>
 `)
 
-	rr = Record(t, config, "/yarpc/heehee/hawhaw")
+	rr = CallAndRecord(t, config, "/yarpc/heehee/hawhaw")
 	assert.Equal(t, rr.Code, http.StatusOK)
 	assert.Equal(t, rr.Body.String(), `
 <!DOCTYPE html>

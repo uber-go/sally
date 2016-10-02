@@ -45,8 +45,8 @@ func GetHandlerFromYAML(t *testing.T, content string) (handler http.Handler, cle
 	return handler, clean
 }
 
-// Record makes a GET request to the Sally handler and returns a response recorder
-func Record(t *testing.T, config string, uri string) *httptest.ResponseRecorder {
+// CallAndRecord makes a GET request to the Sally handler and returns a response recorder
+func CallAndRecord(t *testing.T, config string, uri string) *httptest.ResponseRecorder {
 	handler, clean := GetHandlerFromYAML(t, config)
 	defer clean()
 
