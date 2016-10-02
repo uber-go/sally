@@ -12,7 +12,29 @@ url: go.uber.org
 packages:
   yarpc:
     repo: github.com/yarpc/yarpc-go
+  thriftrw:
+    repo: github.com/thriftrw/thriftrw-go
 `
+
+func TestIndex(t *testing.T) {
+	rr := CallAndRecord(t, config, "/")
+	assert.Equal(t, rr.Code, http.StatusOK)
+	AssertHTML(t, rr.Body.String(), `
+<!DOCTYPE html>
+<html>
+  <body>
+    <ul>
+      <li>
+        thriftrw - github.com/thriftrw/thriftrw-go
+      </li>
+      <li>
+        yarpc - github.com/yarpc/yarpc-go
+      </li>
+    </ul>
+  </body>
+</html>
+`)
+}
 
 func TestPackageShouldExist(t *testing.T) {
 	rr := CallAndRecord(t, config, "/yarpc")
