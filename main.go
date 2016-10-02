@@ -12,16 +12,19 @@ func main() {
 	port := flag.Int("port", 8080, "port to listen and serve on")
 	flag.Parse()
 
+	log.Printf("Parsing yaml at path: %s\n", *yml)
 	config, err := Parse(*yml)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	log.Printf("Creating HTTP handler with config: %s", config)
 	handler, err := GetHandler(config)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	log.Printf(`Starting HTTP handler on ":%d"`, *port)
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", *port), handler); err != nil {
 		log.Fatal(err)
 	}
