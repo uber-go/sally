@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/yosssi/gohtml"
 )
 
 var config = `
@@ -19,21 +20,17 @@ packages:
 func TestIndex(t *testing.T) {
 	rr := CallAndRecord(t, config, "/")
 	assert.Equal(t, rr.Code, http.StatusOK)
-	AssertHTML(t, rr.Body.String(), `
+	assert.Equal(t, gohtml.Format(rr.Body.String()), gohtml.Format(`
 <!DOCTYPE html>
 <html>
   <body>
     <ul>
-      <li>
-        thriftrw - github.com/thriftrw/thriftrw-go
-      </li>
-      <li>
-        yarpc - github.com/yarpc/yarpc-go
-      </li>
+      <li>thriftrw - github.com/thriftrw/thriftrw-go</li>
+      <li>yarpc - github.com/yarpc/yarpc-go</li>
     </ul>
   </body>
 </html>
-`)
+`))
 }
 
 func TestPackageShouldExist(t *testing.T) {

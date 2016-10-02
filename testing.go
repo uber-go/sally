@@ -5,11 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/yosssi/gohtml"
 )
 
 // TempFile persists contents and returns the path and a clean func
@@ -63,11 +59,4 @@ func CallAndRecord(t *testing.T, config string, uri string) *httptest.ResponseRe
 	handler.ServeHTTP(rr, req)
 
 	return rr
-}
-
-// AssertHTML normalizes got and then assert.Equals want
-func AssertHTML(t *testing.T, got string, want string) {
-	got = gohtml.Format(got)
-	want = strings.Trim(want, "\n")
-	assert.Equal(t, got, want)
 }
