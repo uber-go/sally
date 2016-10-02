@@ -1,45 +1,70 @@
 package main
 
 import (
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func GetHandlerFromYAML(t *testing.T, content string) http.Handler {
-	// TODO pass in yaml from tests by using ioutil.TempFile()
-	config, err := Parse("sally.yaml")
+func TempFile(t *testing.T, contents string) (path string, clean func()) {
+	content := []byte(contents)
+	tmpfile, err := ioutil.TempFile("", "sally-tmp")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	handler, err := GetHandler(config)
+	if _, err := tmpfile.Write(content); err != nil {
+		t.Fatal(err)
+	}
+	if err := tmpfile.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	return tmpfile.Name(), func() {
+		os.Remove(tmpfile.Name())
+	}
+}
+
+func GetHandlerFromYAML(t *testing.T, content string) (handler http.Handler, clean func()) {
+	path, clean := TempFile(t, content)
+
+	config, err := Parse(path)
 	if err != nil {
 		t.Fatal(err)
 	}
-	return handler
+
+	handler, err = GetHandler(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return handler, clean
 }
 
 func Record(t *testing.T, config string, uri string) *httptest.ResponseRecorder {
-	handler := GetHandlerFromYAML(t, config)
+	handler, clean := GetHandlerFromYAML(t, config)
+	defer clean()
+
 	req, err := http.NewRequest("GET", uri, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	rr := httptest.NewRecorder()
 	handler.ServeHTTP(rr, req)
+
 	return rr
 }
 
 var config = `
-
-	url: go.uber.org
-	packages:
-	  yarpc:
-	    repo: github.com/yarpc/yarpc-go
-
+url: go.uber.org
+packages:
+  yarpc:
+    repo: github.com/yarpc/yarpc-go
 `
 
 func TestPackageShouldExist(t *testing.T) {
