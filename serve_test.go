@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,20 +9,20 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-func GetHandlerFromYAML(content string) http.Handler {
+func GetHandlerFromYAML(t *testing.T, content string) http.Handler {
 	var config Config
 	if err := yaml.Unmarshal([]byte(content), &config); err != nil {
-		log.Panic(err)
+		t.Fatal(err)
 	}
 	handler, err := GetHandler(config)
 	if err != nil {
-		log.Panic(err)
+		t.Fatal(err)
 	}
 	return handler
 }
 
 func Record(t *testing.T, config string, uri string) *httptest.ResponseRecorder {
-	handler := GetHandlerFromYAML(config)
+	handler := GetHandlerFromYAML(t, config)
 	req, err := http.NewRequest("GET", uri, nil)
 	if err != nil {
 		t.Fatal(err)
