@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TempFile persists contents and returns the path and a clean func
 func TempFile(t *testing.T, contents string) (path string, clean func()) {
 	content := []byte(contents)
 	tmpfile, err := ioutil.TempFile("", "sally-tmp")
@@ -29,6 +30,7 @@ func TempFile(t *testing.T, contents string) (path string, clean func()) {
 	}
 }
 
+// GetHandlerFromYAML builds the Sally handler from a yaml config string
 func GetHandlerFromYAML(t *testing.T, content string) (handler http.Handler, clean func()) {
 	path, clean := TempFile(t, content)
 
@@ -45,6 +47,7 @@ func GetHandlerFromYAML(t *testing.T, content string) (handler http.Handler, cle
 	return handler, clean
 }
 
+// Record makes a GET request to the Sally handler and returns a response recorder
 func Record(t *testing.T, config string, uri string) *httptest.ResponseRecorder {
 	handler, clean := GetHandlerFromYAML(t, config)
 	defer clean()
