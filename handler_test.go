@@ -86,6 +86,19 @@ func TestTrailingSlash(t *testing.T) {
 func TestDeepImports(t *testing.T) {
 	rr := Record(t, config, "/yarpc/heeheehee")
 	assert.Equal(t, rr.Code, http.StatusOK)
+	assert.Equal(t, rr.Body.String(), `
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go">
+        <meta name="go-source" content="go.uber.org/yarpc https://github.com/yarpc/yarpc-go https://github.com/yarpc/yarpc-go/tree/master{/dir} https://github.com/yarpc/yarpc-go/tree/master{/dir}/{file}#L{line}">
+        <meta http-equiv="refresh" content="0; url=https://godoc.org/go.uber.org/yarpc/heeheehee">
+    </head>
+    <body>
+        Nothing to see here. Please <a href="https://godoc.org/go.uber.org/yarpc/heeheehee">move along</a>.
+    </body>
+</html>
+`)
 
 	rr = Record(t, config, "/yarpc/heehee/hawhaw")
 	assert.Equal(t, rr.Code, http.StatusOK)
