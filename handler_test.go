@@ -16,12 +16,12 @@ func TestIndex(t *testing.T) {
 	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
-  <body>
-    <ul>
-      <li>thriftrw - github.com/thriftrw/thriftrw-go</li>
-      <li>yarpc - github.com/yarpc/yarpc-go</li>
-    </ul>
-  </body>
+    <body>
+        <ul>
+            <li>thriftrw - github.com/thriftrw/thriftrw-go</li>
+            <li>yarpc - github.com/yarpc/yarpc-go</li>
+        </ul>
+    </body>
 </html>
 `)
 }
@@ -46,7 +46,7 @@ func TestPackageShouldExist(t *testing.T) {
 func TestNonExistentPackageShould404(t *testing.T) {
 	rr := CallAndRecord(t, config, "/nonexistent")
 	AssertResponse(t, rr, 404, `
-404 Not found
+404 page not found
 `)
 }
 

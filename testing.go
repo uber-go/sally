@@ -67,5 +67,5 @@ func CallAndRecord(t *testing.T, config string, uri string) *httptest.ResponseRe
 // AssertResponse normalizes and asserts the body from rr against want
 func AssertResponse(t *testing.T, rr *httptest.ResponseRecorder, code int, want string) {
 	assert.Equal(t, rr.Code, code)
-	assert.Equal(t, gohtml.Format(rr.Body.String()), gohtml.Format(want))
+	assert.Equal(t, gohtml.Format(want), gohtml.Format(rr.Body.String()))
 }
