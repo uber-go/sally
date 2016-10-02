@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -11,8 +10,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-func WithConfig(content string, fn func(handler http.Handler)) {
-	fmt.Println(content)
+func GetHandlerFromYAML(content string) http.Handler {
 	var config Config
 	if err := yaml.Unmarshal([]byte(content), &config); err != nil {
 		log.Panic(err)
@@ -21,19 +19,21 @@ func WithConfig(content string, fn func(handler http.Handler)) {
 	if err != nil {
 		log.Panic(err)
 	}
-	fn(handler)
+	return handler
+}
+
+func Record(t *testing.T, config string, uri string) *httptest.ResponseRecorder {
+	handler := GetHandlerFromYAML(config)
+	req, err := http.NewRequest("GET", uri, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	handler.ServeHTTP(rr, req)
+	return rr
 }
 
 func TestNonExistentPackageShould404(t *testing.T) {
-	WithConfig("", func(handler http.Handler) {
-		req, err := http.NewRequest("GET", "/nonexistent", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		rr := httptest.NewRecorder()
-		handler.ServeHTTP(rr, req)
-
-		assert.Equal(t, rr.Code, http.StatusNotFound)
-	})
+	rr := Record(t, "", "/nonexistent")
+	assert.Equal(t, rr.Code, http.StatusNotFound)
 }
