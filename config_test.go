@@ -7,13 +7,13 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	yml := `
+	path, clean := TempFile(t, `
 url: google.golang.org
 packages:
   grpc:
     repo: github.com/grpc/grpc-go
-`
-	path, clean := TempFile(t, yml)
+
+`)
 	defer clean()
 
 	config, err := Parse(path)
