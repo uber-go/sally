@@ -4,6 +4,11 @@ install:
 	glide install
 
 
+.PHONY: test
+test:
+	go test .
+
+
 .PHONY: run
 run:
 	go build && ./sally

@@ -8,14 +8,14 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// ListenAndServe starts a Sally server
-func ListenAndServe(port int, config Config) error {
+// GetHandler starts a Sally server
+func GetHandler(config Config) (http.Handler, error) {
 	router := httprouter.New()
 	router.RedirectTrailingSlash = false
 
 	handle, err := createIndexHandle(config)
 	if err != nil {
-		return err
+		return router, err
 	}
 	router.GET("/", handle)
 
@@ -26,17 +26,13 @@ func ListenAndServe(port int, config Config) error {
 			Config:  config,
 		})
 		if err != nil {
-			return err
+			return router, err
 		}
 		router.GET(fmt.Sprintf("/%s", name), handle)
 		router.GET(fmt.Sprintf("/%s/*path", name), handle)
 	}
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), router); err != nil {
-		return err
-	}
-
-	return nil
+	return router, nil
 }
 
 func createIndexHandle(config Config) (httprouter.Handle, error) {

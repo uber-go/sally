@@ -2,7 +2,9 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
+	"net/http"
 )
 
 func main() {
@@ -15,9 +17,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := ListenAndServe(*port, config); err != nil {
+	handler, err := GetHandler(config)
+	if err != nil {
 		log.Fatal(err)
 	}
 
-	select {}
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", *port), handler); err != nil {
+		log.Fatal(err)
+	}
 }

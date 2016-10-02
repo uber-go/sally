@@ -1,8 +1,10 @@
-hash: 33f6b44b886b66ee62a98c0b49369d593e1cc9d812cfbe09687e8653a8b9b250
-updated: 2016-10-01T14:30:40.946114602-07:00
+hash: cbd4ad0c3a38abd26cd54c3984d607929100723469433b974e872f8db9ed78be
+updated: 2016-10-01T19:06:41.59159043-07:00
 imports:
 - name: github.com/julienschmidt/httprouter
   version: 8c199fb6259ffc1af525cc3ad52ee60ba8359669
+- name: github.com/stretchr/testify
+  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
 - name: gopkg.in/yaml.v2
   version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 testImports: []
