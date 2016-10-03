@@ -95,13 +95,6 @@ func (p packageViewModel) GodocURL() string {
 }
 
 func (p packageViewModel) NewWithAddlGodocPath(uri string) packageViewModel {
-	if uri == "" {
-		return p
-	}
-	return packageViewModel{
-		Package:       p.Package,
-		Name:          p.Name,
-		Config:        p.Config,
-		AddlGodocPath: uri,
-	}
+	p.AddlGodocPath = uri
+	return p
 }
