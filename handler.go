@@ -40,14 +40,16 @@ func CreateHandler(config Config) http.Handler {
 	router := httprouter.New()
 	router.RedirectTrailingSlash = false
 
-	router.GET("/", createIndexHandle(config))
+	router.GET("/", indexHandler{ViewModel: config}.Handle)
 
 	for name, pkg := range config.Packages {
-		handle := createPackageHandle(packageViewModel{
-			Package: pkg,
-			Name:    name,
-			Config:  config,
-		})
+		handle := packageHandler{
+			ViewModel: packageViewModel{
+				Package: pkg,
+				Name:    name,
+				Config:  config,
+			},
+		}.Handle
 		router.GET(fmt.Sprintf("/%s", name), handle)
 		router.GET(fmt.Sprintf("/%s/*path", name), handle)
 	}
@@ -55,16 +57,20 @@ func CreateHandler(config Config) http.Handler {
 	return router
 }
 
-func createIndexHandle(config Config) httprouter.Handle {
-	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		indexTemplate.Execute(w, config)
-	}
+type indexHandler struct {
+	ViewModel Config
 }
 
-func createPackageHandle(pvm packageViewModel) httprouter.Handle {
-	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		packageTemplate.Execute(w, pvm.NewWithAddlGodocPath(ps.ByName("path")))
-	}
+func (h indexHandler) Handle(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	indexTemplate.Execute(w, h.ViewModel)
+}
+
+type packageHandler struct {
+	ViewModel packageViewModel
+}
+
+func (h packageHandler) Handle(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	packageTemplate.Execute(w, h.ViewModel.NewWithAddlGodocPath(ps.ByName("path")))
 }
 
 type packageViewModel struct {
