@@ -8,6 +8,7 @@ import (
 
 func TestParse(t *testing.T) {
 	path, clean := TempFile(t, `
+
 url: google.golang.org
 packages:
   grpc:

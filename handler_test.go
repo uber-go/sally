@@ -3,12 +3,14 @@ package main
 import "testing"
 
 var config = `
+
 url: go.uber.org
 packages:
   yarpc:
     repo: github.com/yarpc/yarpc-go
   thriftrw:
     repo: github.com/thriftrw/thriftrw-go
+
 `
 
 func TestIndex(t *testing.T) {
