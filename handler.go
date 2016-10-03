@@ -70,7 +70,7 @@ type packageHandler struct {
 }
 
 func (h packageHandler) Handle(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	packageTemplate.Execute(w, h.ViewModel.NewWithAddlGodocPath(ps.ByName("path")))
+	packageTemplate.Execute(w, h.ViewModel.WithAddlGodocPath(ps.ByName("path")))
 }
 
 type packageViewModel struct {
@@ -89,7 +89,7 @@ func (p packageViewModel) GodocURL() string {
 	return fmt.Sprintf("https://godoc.org/%s%s", p.CanonicalURL(), p.AddlGodocPath)
 }
 
-func (p packageViewModel) NewWithAddlGodocPath(uri string) packageViewModel {
+func (p packageViewModel) WithAddlGodocPath(uri string) packageViewModel {
 	p.AddlGodocPath = uri
 	return p
 }
