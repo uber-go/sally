@@ -16,14 +16,14 @@ func TempFile(t *testing.T, contents string) (path string, clean func()) {
 	content := []byte(contents)
 	tmpfile, err := ioutil.TempFile("", "sally-tmp")
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal("Unable to create tmpfile", err)
 	}
 
 	if _, err := tmpfile.Write(content); err != nil {
-		t.Fatal(err)
+		t.Fatal("Unable to write tmpfile", err)
 	}
 	if err := tmpfile.Close(); err != nil {
-		t.Fatal(err)
+		t.Fatal("Unable to close tmpfile", err)
 	}
 
 	return tmpfile.Name(), func() {
@@ -37,7 +37,7 @@ func CreateHandlerFromYAML(t *testing.T, content string) (handler http.Handler, 
 
 	config, err := Parse(path)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("Unable to parse %s: %v", path, err)
 	}
 
 	return CreateHandler(config), clean
@@ -50,7 +50,7 @@ func CallAndRecord(t *testing.T, config string, uri string) *httptest.ResponseRe
 
 	req, err := http.NewRequest("GET", uri, nil)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("Unable to create request to %s: %v", uri, err)
 	}
 
 	rr := httptest.NewRecorder()
