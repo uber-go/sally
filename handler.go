@@ -8,35 +8,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-// CreateHandler creates a Sally http.Handler
-func CreateHandler(config Config) (http.Handler, error) {
-	router := httprouter.New()
-	router.RedirectTrailingSlash = false
-
-	handle, err := createIndexHandle(config)
-	if err != nil {
-		return router, err
-	}
-	router.GET("/", handle)
-
-	for name, pkg := range config.Packages {
-		handle, err := createPackageHandle(packageViewModel{
-			Package: pkg,
-			Name:    name,
-			Config:  config,
-		})
-		if err != nil {
-			return router, err
-		}
-		router.GET(fmt.Sprintf("/%s", name), handle)
-		router.GET(fmt.Sprintf("/%s/*path", name), handle)
-	}
-
-	return router, nil
-}
-
-func createIndexHandle(config Config) (httprouter.Handle, error) {
-	t, err := template.New("index").Parse(`
+var indexTemplate = template.Must(template.New("index").Parse(`
 <!DOCTYPE html>
 <html>
     <body>
@@ -47,17 +19,9 @@ func createIndexHandle(config Config) (httprouter.Handle, error) {
         </ul>
     </body>
 </html>
-`)
-	if err != nil {
-		return nil, err
-	}
-	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		t.Execute(w, config)
-	}, nil
-}
+`))
 
-func createPackageHandle(pvm packageViewModel) (httprouter.Handle, error) {
-	t, err := template.New("package").Parse(`
+var packageTemplate = template.Must(template.New("package").Parse(`
 <!DOCTYPE html>
 <html>
     <head>
@@ -69,13 +33,38 @@ func createPackageHandle(pvm packageViewModel) (httprouter.Handle, error) {
         Nothing to see here. Please <a href="{{ .GodocURL }}">move along</a>.
     </body>
 </html>
-`)
-	if err != nil {
-		return nil, err
+`))
+
+// CreateHandler creates a Sally http.Handler
+func CreateHandler(config Config) http.Handler {
+	router := httprouter.New()
+	router.RedirectTrailingSlash = false
+
+	router.GET("/", createIndexHandle(config))
+
+	for name, pkg := range config.Packages {
+		handle := createPackageHandle(packageViewModel{
+			Package: pkg,
+			Name:    name,
+			Config:  config,
+		})
+		router.GET(fmt.Sprintf("/%s", name), handle)
+		router.GET(fmt.Sprintf("/%s/*path", name), handle)
 	}
+
+	return router
+}
+
+func createIndexHandle(config Config) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		indexTemplate.Execute(w, config)
+	}
+}
+
+func createPackageHandle(pvm packageViewModel) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		t.Execute(w, pvm.NewWithAddlGodocPath(ps.ByName("path")))
-	}, nil
+		packageTemplate.Execute(w, pvm.NewWithAddlGodocPath(ps.ByName("path")))
+	}
 }
 
 type packageViewModel struct {

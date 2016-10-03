@@ -19,10 +19,7 @@ func main() {
 	}
 
 	log.Printf("Creating HTTP handler with config: %s", config)
-	handler, err := CreateHandler(config)
-	if err != nil {
-		log.Fatal(err)
-	}
+	handler := CreateHandler(config)
 
 	log.Printf(`Starting HTTP handler on ":%d"`, *port)
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", *port), handler); err != nil {

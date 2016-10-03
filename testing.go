@@ -40,12 +40,7 @@ func CreateHandlerFromYAML(t *testing.T, content string) (handler http.Handler, 
 		t.Fatal(err)
 	}
 
-	handler, err = CreateHandler(config)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return handler, clean
+	return CreateHandler(config), clean
 }
 
 // CallAndRecord makes a GET request to the Sally handler and returns a response recorder
