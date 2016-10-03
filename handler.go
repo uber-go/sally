@@ -33,7 +33,9 @@ type indexHandler struct {
 }
 
 func (h indexHandler) Handle(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	indexTemplate.Execute(w, h.config)
+	if err := indexTemplate.Execute(w, h.config); err != nil {
+		http.Error(w, err.Error(), 500)
+	}
 }
 
 var indexTemplate = template.Must(template.New("index").Parse(`
@@ -57,7 +59,7 @@ type packageHandler struct {
 
 func (h packageHandler) Handle(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	canonicalURL := fmt.Sprintf("%s/%s", h.config.URL, h.pkgName)
-	packageTemplate.Execute(w, struct {
+	data := struct {
 		Repo         string
 		CanonicalURL string
 		GodocURL     string
@@ -65,7 +67,10 @@ func (h packageHandler) Handle(w http.ResponseWriter, r *http.Request, ps httpro
 		Repo:         h.pkg.Repo,
 		CanonicalURL: canonicalURL,
 		GodocURL:     fmt.Sprintf("https://godoc.org/%s%s", canonicalURL, ps.ByName("path")),
-	})
+	}
+	if err := packageTemplate.Execute(w, data); err != nil {
+		http.Error(w, err.Error(), 500)
+	}
 }
 
 var packageTemplate = template.Must(template.New("package").Parse(`
