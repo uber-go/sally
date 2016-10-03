@@ -22,7 +22,5 @@ func main() {
 	handler := CreateHandler(config)
 
 	log.Printf(`Starting HTTP handler on ":%d"`, *port)
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", *port), handler); err != nil {
-		log.Fatal(err)
-	}
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), handler))
 }
