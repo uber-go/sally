@@ -9,7 +9,7 @@ install:
 .PHONY: lint
 lint:
 	go vet $(PACKAGES)
-	golint .
+	$(foreach pkg, $(PACKAGES), golint $(pkg))
 
 
 .PHONY: test
