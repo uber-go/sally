@@ -40,15 +40,13 @@ func CreateHandler(config Config) http.Handler {
 	router := httprouter.New()
 	router.RedirectTrailingSlash = false
 
-	router.GET("/", indexHandler{ViewModel: config}.Handle)
+	router.GET("/", indexHandler{config: config}.Handle)
 
 	for name, pkg := range config.Packages {
 		handle := packageHandler{
-			ViewModel: packageViewModel{
-				Package: pkg,
-				Name:    name,
-				Config:  config,
-			},
+			pkgName: name,
+			pkg:     pkg,
+			config:  config,
 		}.Handle
 		router.GET(fmt.Sprintf("/%s", name), handle)
 		router.GET(fmt.Sprintf("/%s/*path", name), handle)
@@ -58,38 +56,28 @@ func CreateHandler(config Config) http.Handler {
 }
 
 type indexHandler struct {
-	ViewModel Config
+	config Config
 }
 
 func (h indexHandler) Handle(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	indexTemplate.Execute(w, h.ViewModel)
+	indexTemplate.Execute(w, h.config)
 }
 
 type packageHandler struct {
-	ViewModel packageViewModel
+	pkgName string
+	pkg     Package
+	config  Config
 }
 
 func (h packageHandler) Handle(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	packageTemplate.Execute(w, h.ViewModel.WithAddlGodocPath(ps.ByName("path")))
-}
-
-type packageViewModel struct {
-	Package
-
-	Name          string
-	Config        Config
-	AddlGodocPath string
-}
-
-func (p packageViewModel) CanonicalURL() string {
-	return fmt.Sprintf("%s/%s", p.Config.URL, p.Name)
-}
-
-func (p packageViewModel) GodocURL() string {
-	return fmt.Sprintf("https://godoc.org/%s%s", p.CanonicalURL(), p.AddlGodocPath)
-}
-
-func (p packageViewModel) WithAddlGodocPath(uri string) packageViewModel {
-	p.AddlGodocPath = uri
-	return p
+	canonicalURL := fmt.Sprintf("%s/%s", h.config.URL, h.pkgName)
+	packageTemplate.Execute(w, struct {
+		Repo         string
+		CanonicalURL string
+		GodocURL     string
+	}{
+		Repo:         h.pkg.Repo,
+		CanonicalURL: canonicalURL,
+		GodocURL:     fmt.Sprintf("https://godoc.org/%s%s", canonicalURL, ps.ByName("path")),
+	})
 }
