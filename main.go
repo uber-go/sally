@@ -18,7 +18,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Printf("Creating HTTP handler with config: %s", config)
+	log.Printf("Creating HTTP handler with config: %v", config)
 	handler := CreateHandler(config)
 
 	log.Printf(`Starting HTTP handler on ":%d"`, *port)
