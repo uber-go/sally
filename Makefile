@@ -1,3 +1,5 @@
+PACKAGES := $(shell glide novendor)
+
 .PHONY: install
 install:
 	glide --version || go get github.com/Masterminds/glide
@@ -6,13 +8,13 @@ install:
 
 .PHONY: lint
 lint:
-	go vet .
+	go vet $(PACKAGES)
 	golint .
 
 
 .PHONY: test
 test: lint
-	go test -race .
+	go test -race $(PACKAGES)
 
 
 .PHONY: run
