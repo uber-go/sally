@@ -15,7 +15,7 @@ func main() {
 	log.Printf("Parsing yaml at path: %s\n", *yml)
 	config, err := Parse(*yml)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to parse %s: %v", *yml, err)
 	}
 
 	log.Printf("Creating HTTP handler with config: %v", config)
