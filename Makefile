@@ -19,4 +19,4 @@ test: lint
 
 .PHONY: run
 run:
-	go build && ./sally
+	go build -i && ./sally
