@@ -1,10 +1,22 @@
+PACKAGES := $(shell glide novendor)
+
 .PHONY: install
 install:
 	glide --version || go get github.com/Masterminds/glide
 	glide install
-	go get -u github.com/jteeuwen/go-bindata/...
+
+
+.PHONY: lint
+lint:
+	go vet $(PACKAGES)
+	$(foreach pkg, $(PACKAGES), golint $(pkg) &&) echo "success"
+
+
+.PHONY: test
+test: lint
+	go test -race $(PACKAGES)
 
 
 .PHONY: run
 run:
-	go generate && go build && ./sally
+	go build -i && ./sally
