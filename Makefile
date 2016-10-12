@@ -9,7 +9,7 @@ install:
 .PHONY: lint
 lint:
 	go vet $(PACKAGES)
-	$(foreach pkg, $(PACKAGES), golint $(pkg) &&) echo "success"<Paste>
+	$(foreach pkg, $(PACKAGES), golint $(pkg) &&) echo "success"
 
 
 .PHONY: test
