@@ -1,6 +1,10 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 var config = `
 
@@ -50,6 +54,7 @@ func TestNonExistentPackageShould404(t *testing.T) {
 	AssertResponse(t, rr, 404, `
 404 page not found
 `)
+	assert.Equal(t, "no-cache", rr.Header().Get("Cache-Control"))
 }
 
 func TestTrailingSlash(t *testing.T) {

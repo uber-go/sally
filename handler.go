@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"io"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -12,6 +13,7 @@ import (
 func CreateHandler(config Config) http.Handler {
 	router := httprouter.New()
 	router.RedirectTrailingSlash = false
+	router.NotFound = notFoundHandlerFunc
 
 	router.GET("/", indexHandler{config: config}.Handle)
 
@@ -26,6 +28,14 @@ func CreateHandler(config Config) http.Handler {
 	}
 
 	return router
+}
+
+func notFoundHandlerFunc(w http.ResponseWriter, r *http.Request) {
+	// don't cache 404s so that edge caches always request from origin
+	w.Header().Set("Cache-Control", "no-cache")
+
+	w.WriteHeader(http.StatusNotFound)
+	io.WriteString(w, "404 page not found")
 }
 
 type indexHandler struct {
