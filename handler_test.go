@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -107,9 +108,15 @@ func TestDeepImports(t *testing.T) {
 }
 
 func TestMethodNotAllowed(t *testing.T) {
-	rr := CallAndRecord(t, config, "POST", "/")
-	AssertResponse(t, rr, 405, `
-405 method not allowed
-`)
-	assert.Equal(t, "no-cache", rr.Header().Get("Cache-Control"))
+	methods := []string{"POST", "PUT", "DELETE", "OPTIONS", "HEAD"}
+	uris := []string{"/", "/yarpc"}
+	for _, method := range methods {
+		for _, uri := range uris {
+			t.Run(fmt.Sprintf("%s => %s", method, uri), func(t *testing.T) {
+				rr := CallAndRecord(t, config, method, uri)
+				AssertResponse(t, rr, 405, "\n405 method not allowed\n")
+				assert.Equal(t, "no-cache", rr.Header().Get("Cache-Control"))
+			})
+		}
+	}
 }
