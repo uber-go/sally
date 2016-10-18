@@ -18,7 +18,7 @@ packages:
 `
 
 func TestIndex(t *testing.T) {
-	rr := CallAndRecord(t, config, "/")
+	rr := CallAndRecord(t, config, "GET", "/")
 	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
@@ -33,7 +33,7 @@ func TestIndex(t *testing.T) {
 }
 
 func TestPackageShouldExist(t *testing.T) {
-	rr := CallAndRecord(t, config, "/yarpc")
+	rr := CallAndRecord(t, config, "GET", "/yarpc")
 	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
@@ -50,7 +50,7 @@ func TestPackageShouldExist(t *testing.T) {
 }
 
 func TestNonExistentPackageShould404(t *testing.T) {
-	rr := CallAndRecord(t, config, "/nonexistent")
+	rr := CallAndRecord(t, config, "GET", "/nonexistent")
 	AssertResponse(t, rr, 404, `
 404 page not found
 `)
@@ -58,7 +58,7 @@ func TestNonExistentPackageShould404(t *testing.T) {
 }
 
 func TestTrailingSlash(t *testing.T) {
-	rr := CallAndRecord(t, config, "/yarpc/")
+	rr := CallAndRecord(t, config, "GET", "/yarpc/")
 	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
@@ -75,7 +75,7 @@ func TestTrailingSlash(t *testing.T) {
 }
 
 func TestDeepImports(t *testing.T) {
-	rr := CallAndRecord(t, config, "/yarpc/heeheehee")
+	rr := CallAndRecord(t, config, "GET", "/yarpc/heeheehee")
 	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
@@ -90,7 +90,7 @@ func TestDeepImports(t *testing.T) {
 </html>
 `)
 
-	rr = CallAndRecord(t, config, "/yarpc/heehee/hawhaw")
+	rr = CallAndRecord(t, config, "GET", "/yarpc/heehee/hawhaw")
 	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
@@ -104,4 +104,12 @@ func TestDeepImports(t *testing.T) {
     </body>
 </html>
 `)
+}
+
+func TestMethodNotAllowed(t *testing.T) {
+	rr := CallAndRecord(t, config, "POST", "/")
+	AssertResponse(t, rr, 405, `
+405 method not allowed
+`)
+	assert.Equal(t, "no-cache", rr.Header().Get("Cache-Control"))
 }

@@ -44,11 +44,11 @@ func CreateHandlerFromYAML(t *testing.T, content string) (handler http.Handler, 
 }
 
 // CallAndRecord makes a GET request to the Sally handler and returns a response recorder
-func CallAndRecord(t *testing.T, config string, uri string) *httptest.ResponseRecorder {
+func CallAndRecord(t *testing.T, config string, method string, uri string) *httptest.ResponseRecorder {
 	handler, clean := CreateHandlerFromYAML(t, config)
 	defer clean()
 
-	req, err := http.NewRequest("GET", uri, nil)
+	req, err := http.NewRequest(method, uri, nil)
 	if err != nil {
 		t.Fatalf("Unable to create request to %s: %v", uri, err)
 	}

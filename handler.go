@@ -14,6 +14,8 @@ func CreateHandler(config Config) http.Handler {
 	router := httprouter.New()
 	router.RedirectTrailingSlash = false
 	router.NotFound = notFoundHandlerFunc
+	router.HandleMethodNotAllowed = true
+	router.MethodNotAllowed = methodNotAllowedHandlerFunc
 
 	router.GET("/", indexHandler{config: config}.Handle)
 
@@ -28,14 +30,6 @@ func CreateHandler(config Config) http.Handler {
 	}
 
 	return router
-}
-
-func notFoundHandlerFunc(w http.ResponseWriter, r *http.Request) {
-	// don't cache 404s so that edge caches always request from origin
-	w.Header().Set("Cache-Control", "no-cache")
-
-	w.WriteHeader(http.StatusNotFound)
-	io.WriteString(w, "404 page not found")
 }
 
 type indexHandler struct {
@@ -96,3 +90,19 @@ var packageTemplate = template.Must(template.New("package").Parse(`
     </body>
 </html>
 `))
+
+func notFoundHandlerFunc(w http.ResponseWriter, r *http.Request) {
+	// don't cache 404s so that edge caches always request from origin
+	w.Header().Set("Cache-Control", "no-cache")
+
+	w.WriteHeader(http.StatusNotFound)
+	io.WriteString(w, "404 page not found")
+}
+
+func methodNotAllowedHandlerFunc(w http.ResponseWriter, r *http.Request) {
+	// don't cache 405s so that edge caches always request from origin
+	w.Header().Set("Cache-Control", "no-cache")
+
+	w.WriteHeader(http.StatusMethodNotAllowed)
+	io.WriteString(w, "405 method not allowed")
+}
