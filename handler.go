@@ -10,12 +10,13 @@ import (
 )
 
 // CreateHandler creates a Sally http.Handler
-func CreateHandler(config Config) http.Handler {
+func CreateHandler(config Config) *httprouter.Router {
 	router := httprouter.New()
 	router.RedirectTrailingSlash = false
 	router.NotFound = notFoundHandlerFunc
 	router.HandleMethodNotAllowed = true
 	router.MethodNotAllowed = methodNotAllowedHandlerFunc
+	router.PanicHandler = panicHandlerFunc
 
 	router.GET("/", indexHandler{config: config}.Handle)
 
@@ -105,4 +106,14 @@ func methodNotAllowedHandlerFunc(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusMethodNotAllowed)
 	io.WriteString(w, "405 method not allowed")
+}
+
+func panicHandlerFunc(w http.ResponseWriter, r *http.Request, i interface{}) {
+	// don't cache 500s so that edge caches always request from origin
+	w.Header().Set("Cache-Control", "no-cache")
+
+	w.WriteHeader(http.StatusInternalServerError)
+	io.WriteString(w, "500 internal server error")
+
+	// TODO write error to log
 }

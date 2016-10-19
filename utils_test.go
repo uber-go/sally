@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/julienschmidt/httprouter"
 	"github.com/stretchr/testify/assert"
 	"github.com/yosssi/gohtml"
 )
@@ -32,7 +33,7 @@ func TempFile(t *testing.T, contents string) (path string, clean func()) {
 }
 
 // CreateHandlerFromYAML builds the Sally handler from a yaml config string
-func CreateHandlerFromYAML(t *testing.T, content string) (handler http.Handler, clean func()) {
+func CreateHandlerFromYAML(t *testing.T, content string) (handler *httprouter.Router, clean func()) {
 	path, clean := TempFile(t, content)
 
 	config, err := Parse(path)
@@ -43,10 +44,15 @@ func CreateHandlerFromYAML(t *testing.T, content string) (handler http.Handler, 
 	return CreateHandler(config), clean
 }
 
-// CallAndRecord makes a GET request to the Sally handler and returns a response recorder
+// CallAndRecord makes a request the handler created by config and returns a response recorder
 func CallAndRecord(t *testing.T, config string, method string, uri string) *httptest.ResponseRecorder {
 	handler, clean := CreateHandlerFromYAML(t, config)
 	defer clean()
+
+	// attach a handler that panics for testing
+	handler.GET("/panic", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		panic("oh boy")
+	})
 
 	req, err := http.NewRequest(method, uri, nil)
 	if err != nil {

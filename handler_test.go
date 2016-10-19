@@ -120,3 +120,9 @@ func TestMethodNotAllowed(t *testing.T) {
 		}
 	}
 }
+
+func TestInternalServerError(t *testing.T) {
+	rr := CallAndRecord(t, config, "GET", "/panic")
+	AssertResponse(t, rr, 500, "\n500 internal server error\n")
+	assert.Equal(t, "no-cache", rr.Header().Get("Cache-Control"))
+}
