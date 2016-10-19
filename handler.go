@@ -3,15 +3,20 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"io"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 )
 
 // CreateHandler creates a Sally http.Handler
-func CreateHandler(config Config) http.Handler {
+func CreateHandler(config Config) *httprouter.Router {
 	router := httprouter.New()
 	router.RedirectTrailingSlash = false
+	router.NotFound = notFoundHandlerFunc
+	router.HandleMethodNotAllowed = true
+	router.MethodNotAllowed = methodNotAllowedHandlerFunc
+	router.PanicHandler = panicHandlerFunc
 
 	router.GET("/", indexHandler{config: config}.Handle)
 
@@ -86,3 +91,29 @@ var packageTemplate = template.Must(template.New("package").Parse(`
     </body>
 </html>
 `))
+
+func notFoundHandlerFunc(w http.ResponseWriter, r *http.Request) {
+	// don't cache 404s so that edge caches always request from origin
+	w.Header().Set("Cache-Control", "no-cache")
+
+	w.WriteHeader(http.StatusNotFound)
+	io.WriteString(w, "404 page not found")
+}
+
+func methodNotAllowedHandlerFunc(w http.ResponseWriter, r *http.Request) {
+	// don't cache 405s so that edge caches always request from origin
+	w.Header().Set("Cache-Control", "no-cache")
+
+	w.WriteHeader(http.StatusMethodNotAllowed)
+	io.WriteString(w, "405 method not allowed")
+}
+
+func panicHandlerFunc(w http.ResponseWriter, r *http.Request, i interface{}) {
+	// don't cache 500s so that edge caches always request from origin
+	w.Header().Set("Cache-Control", "no-cache")
+
+	w.WriteHeader(http.StatusInternalServerError)
+	io.WriteString(w, "500 internal server error")
+
+	// TODO write error to log
+}

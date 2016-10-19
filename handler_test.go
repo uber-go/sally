@@ -1,6 +1,11 @@
 package main
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 var config = `
 
@@ -14,7 +19,7 @@ packages:
 `
 
 func TestIndex(t *testing.T) {
-	rr := CallAndRecord(t, config, "/")
+	rr := CallAndRecord(t, config, "GET", "/")
 	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
@@ -29,7 +34,7 @@ func TestIndex(t *testing.T) {
 }
 
 func TestPackageShouldExist(t *testing.T) {
-	rr := CallAndRecord(t, config, "/yarpc")
+	rr := CallAndRecord(t, config, "GET", "/yarpc")
 	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
@@ -46,14 +51,15 @@ func TestPackageShouldExist(t *testing.T) {
 }
 
 func TestNonExistentPackageShould404(t *testing.T) {
-	rr := CallAndRecord(t, config, "/nonexistent")
+	rr := CallAndRecord(t, config, "GET", "/nonexistent")
 	AssertResponse(t, rr, 404, `
 404 page not found
 `)
+	assert.Equal(t, "no-cache", rr.Header().Get("Cache-Control"))
 }
 
 func TestTrailingSlash(t *testing.T) {
-	rr := CallAndRecord(t, config, "/yarpc/")
+	rr := CallAndRecord(t, config, "GET", "/yarpc/")
 	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
@@ -70,7 +76,7 @@ func TestTrailingSlash(t *testing.T) {
 }
 
 func TestDeepImports(t *testing.T) {
-	rr := CallAndRecord(t, config, "/yarpc/heeheehee")
+	rr := CallAndRecord(t, config, "GET", "/yarpc/heeheehee")
 	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
@@ -85,7 +91,7 @@ func TestDeepImports(t *testing.T) {
 </html>
 `)
 
-	rr = CallAndRecord(t, config, "/yarpc/heehee/hawhaw")
+	rr = CallAndRecord(t, config, "GET", "/yarpc/heehee/hawhaw")
 	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
@@ -99,4 +105,24 @@ func TestDeepImports(t *testing.T) {
     </body>
 </html>
 `)
+}
+
+func TestMethodNotAllowed(t *testing.T) {
+	methods := []string{"POST", "PUT", "DELETE", "OPTIONS", "HEAD"}
+	uris := []string{"/", "/yarpc"}
+	for _, method := range methods {
+		for _, uri := range uris {
+			t.Run(fmt.Sprintf("%s => %s", method, uri), func(t *testing.T) {
+				rr := CallAndRecord(t, config, method, uri)
+				AssertResponse(t, rr, 405, "\n405 method not allowed\n")
+				assert.Equal(t, "no-cache", rr.Header().Get("Cache-Control"))
+			})
+		}
+	}
+}
+
+func TestInternalServerError(t *testing.T) {
+	rr := CallAndRecord(t, config, "GET", "/panic")
+	AssertResponse(t, rr, 500, "\n500 internal server error\n")
+	assert.Equal(t, "no-cache", rr.Header().Get("Cache-Control"))
 }
