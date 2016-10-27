@@ -60,7 +60,7 @@ func Parse(path string) (*Config, error) {
 	}
 
 	if !ensureAlphabetical(data) {
-		return nil, fmt.Errorf("Packages in %s must be alphabetically ordered.", path)
+		return nil, fmt.Errorf("packages in %s must be alphabetically ordered", path)
 	}
 
 	return &c, err
