@@ -9,7 +9,7 @@ import (
 )
 
 // CreateHandler creates a Sally http.Handler
-func CreateHandler(config Config) http.Handler {
+func CreateHandler(config *Config) http.Handler {
 	router := httprouter.New()
 	router.RedirectTrailingSlash = false
 
@@ -29,7 +29,7 @@ func CreateHandler(config Config) http.Handler {
 }
 
 type indexHandler struct {
-	config Config
+	config *Config
 }
 
 func (h indexHandler) Handle(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -54,7 +54,7 @@ var indexTemplate = template.Must(template.New("index").Parse(`
 type packageHandler struct {
 	pkgName string
 	pkg     Package
-	config  Config
+	config  *Config
 }
 
 func (h packageHandler) Handle(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
