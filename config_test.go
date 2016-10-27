@@ -42,5 +42,7 @@ packages:
 	defer clean()
 
 	_, err := Parse(path)
-	assert.Error(t, err, "YAML configuration is not listed alphabetically")
+	if assert.Error(t, err, "YAML configuration is not listed alphabetically") {
+		assert.Contains(t, err.Error(), "must be alphabetically ordered")
+	}
 }
