@@ -1,7 +1,7 @@
 package main
 
 import (
-	"errors"
+	"fmt"
 	"io/ioutil"
 	"sort"
 
@@ -60,7 +60,7 @@ func Parse(path string) (*Config, error) {
 	}
 
 	if !ensureAlphabetical(data) {
-		return nil, errors.New("YAML configuration is not listed alphabetically")
+		return nil, fmt.Errorf("Packages in %s must be alphabetically ordered.", path)
 	}
 
 	return &c, err

@@ -43,5 +43,5 @@ packages:
 
 	_, err := Parse(path)
 
-	assert.EqualError(t, err, "YAML configuration is not listed alphabetically")
+	assert.Error(t, err, "YAML configuration is not listed alphabetically")
 }
