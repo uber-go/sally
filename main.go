@@ -1,4 +1,4 @@
-package main
+package main // import "go.uber.org/sally"
 
 import (
 	"flag"
