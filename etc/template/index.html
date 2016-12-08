@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="shortcut icon" href="{{.IndexShortcutIconURL}}" />
+    <title>{{.IndexTitle}}</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Projects</h1>
+      <table class="table-condensed">
+        {{range $package := .Packages}}{{if not $package.Private}}<tr>
+          <td><a href="{{$package.IndexURL}}">{{$package.GoPackage}}</a></td>
+          <td>{{range $image := $package.Images}}<a href="{{$image.URL}}"><img src="{{$image.Source}}" alt="Image"></a>{{end}}</td>
+        </tr>
+        {{end}}{{end}}
+      </table>
+      <div class="row">
+        <ul class="nav nav-pills">
+          {{range $indexLink := .IndexLinks}}<li><a href="{{$indexLink.URL}}" target="_blank">{{$indexLink.Name}}</a></li>
+          {{end}}
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,27 +1,64 @@
-hash: 8f67008e0ad384b7bab0cf30ee7b6926b7145c5be7e95b6be35163930eb7f7e6
-updated: 2016-10-12T10:19:26.528895463-07:00
+hash: 7ad5847ec1a9e81dc66403b9c0aa51563dfbac2469a26af193c607dc9a25887c
+updated: 2016-12-08T16:33:14.898706213+01:00
 imports:
+- name: github.com/fatih/color
+  version: bf82308e8c8546dc2b945157173eb8a959ae9505
+- name: github.com/golang/protobuf
+  version: 8ee79997227bf9b34611aee7946ae64735e6fd93
+  subpackages:
+  - jsonpb
+  - proto
+- name: github.com/mattn/go-colorable
+  version: d228849504861217f796da67fae4f6e347643f15
+- name: github.com/mattn/go-isatty
+  version: 30a891c33c7cde7b02a981314b4228ec99380cca
+- name: github.com/satori/go.uuid
+  version: b061729afc07e77a8aa4fad0a2fd840958f1942a
+- name: go.pedge.io/env
+  version: 7e2afbc4865e7895f8786bfb72eacc3629dfde7d
+- name: go.pedge.io/lion
+  version: 2d5a99249f6aff9b59b5eb62be3dc6a5a14b827e
+  subpackages:
+  - current
+  - env
+  - grpc
+  - proto
+  - syslog
+- name: go.pedge.io/pb
+  version: b3b233a97f5a9ace4b73ae558fb12fcb8f8b3be5
+  subpackages:
+  - go/google/protobuf
+  - go/google/type
+  - go/pb/money
+- name: go.pedge.io/pkg
+  version: 4b4b9a0962c83973011edadd4a6f3ed442856d52
+  subpackages:
+  - errors
+  - http
+  - tmpl
+- name: golang.org/x/sys
+  version: 478fcf54317e52ab69f40bb4c7a1520288d7f7ea
+  subpackages:
+  - unix
+- name: google.golang.org/grpc
+  version: 7484960149bc6abec1aa7512626c4831a9fe9af2
+  subpackages:
+  - grpclog
+- name: gopkg.in/tylerb/graceful.v1
+  version: 50a48b6e73fcc75b45e22c05b79629a67c79e938
+- name: gopkg.in/yaml.v2
+  version: a5b47d31c556af34a302ce5d659e6fea44d90de0
+testImports:
 - name: github.com/davecgh/go-spew
-  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
+  version: 04cdfd42973bb9c8589fd6a731800cf222fde1a9
   subpackages:
   - spew
-- name: github.com/julienschmidt/httprouter
-  version: 8c199fb6259ffc1af525cc3ad52ee60ba8359669
 - name: github.com/pmezard/go-difflib
   version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
   subpackages:
   - difflib
 - name: github.com/stretchr/testify
-  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
+  version: 18a02ba4a312f95da08ff4cfc0055750ce50ae9e
   subpackages:
   - assert
-- name: github.com/yosssi/gohtml
-  version: ccf383eafddde21dfe37c6191343813822b30e6b
-- name: golang.org/x/net
-  version: 8058fc7b18f8794d9fc57eee98d64fe2c750e3f1
-  subpackages:
-  - html
-  - html/atom
-- name: gopkg.in/yaml.v2
-  version: 31c299268d302dd0aa9a0dcf765a3d58971ac83f
-testImports: []
+  - require

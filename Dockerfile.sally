@@ -1,0 +1,13 @@
+FROM scratch
+MAINTAINER pedge@uber.com
+
+EXPOSE 8080
+ENV LOG_APP_NAME sally
+ENV GO_TEMPLATE /go.html
+ENV INDEX_TEMPLATE /index.html
+ENV CONFIG /config.yaml
+ADD etc/template/go.html /
+ADD etc/template/index.html /
+ADD etc/config/config.yaml /
+ADD _tmp/sally /
+ENTRYPOINT ["/sally"]
