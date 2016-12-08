@@ -2,6 +2,7 @@ package sally
 
 import (
 	"fmt"
+	"sort"
 
 	"go.pedge.io/pkg/errors"
 )
@@ -50,6 +51,7 @@ func newTmplConfig(yamlConfig *yamlConfig) (*tmplConfig, error) {
 		}
 		tmplConfig.Packages = append(tmplConfig.Packages, tmplPackage)
 	}
+	sort.Sort(tmplPackageByGoPackage(tmplConfig.Packages))
 	for _, yamlIndexLink := range yamlConfig.IndexLinks {
 		tmplConfig.IndexLinks = append(
 			tmplConfig.IndexLinks,
@@ -108,3 +110,9 @@ func newTmplPackage(configURL string, path string, yamlPackage *yamlPackage) (*t
 	}
 	return tmplPackage, nil
 }
+
+type tmplPackageByGoPackage []*tmplPackage
+
+func (t tmplPackageByGoPackage) Len() int               { return len(t) }
+func (t tmplPackageByGoPackage) Swap(i int, j int)      { t[i], t[j] = t[j], t[i] }
+func (t tmplPackageByGoPackage) Less(i int, j int) bool { return t[i].GoPackage < t[j].GoPackage }
