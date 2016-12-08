@@ -2,12 +2,16 @@ PKGS := $(shell go list ./... | grep -v go.uber.org/sally/vendor)
 
 all: test
 
-vendor:
+vendor-update:
 	rm -rf vendor
 	go get -d -v -t -u -f ./...
 	go get -v github.com/Masterminds/glide
 	glide create
 	glide update
+
+vendor-install:
+	go get -v github.com/Masterminds/glide
+	glide-install
 
 build:
 	go build $(PKGS)
@@ -69,7 +73,8 @@ launch:
 
 .PHONY: \
 	all \
-	vendor \
+	vendor-update \
+	vendor-install \
 	build \
 	install \
 	lint \
