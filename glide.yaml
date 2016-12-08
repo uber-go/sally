@@ -1,8 +1,0 @@
-package: github.com/uber-go/sally
-import:
-- package: gopkg.in/yaml.v2
-- package: github.com/julienschmidt/httprouter
-  version: ^1
-testImport:
-- package: github.com/stretchr/testify
-- package: github.com/yosssi/gohtml
