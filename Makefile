@@ -55,10 +55,10 @@ docker-build-internal:
 docker-build: docker-build-dev
 	docker run -v /var/run/docker.sock:/var/run/docker.sock uber/sally-dev make docker-build-internal
 
-docker-dev-launch-internal: install
+docker-launch-dev-internal: install
 	sally
 
-docker-dev-launch: docker-build-dev
+docker-launch-dev: docker-build-dev
 	docker run -p 8080:8080 uber/sally-dev
 
 docker-launch: docker-build
@@ -82,7 +82,7 @@ launch:
 	docker-test \
 	docker-build-internal \
 	docker-build \
-	docker-dev-launch-internal \
-	docker-dev-launch \
+	docker-launch-dev-internal \
+	docker-launch-dev \
 	docker-launch \
 	launch

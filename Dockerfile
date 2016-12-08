@@ -15,9 +15,9 @@ RUN \
     github.com/kisielk/errcheck \
     github.com/Masterminds/glide
 RUN mkdir -p /go/src/go.uber.org/sally
+WORKDIR /go/src/go.uber.org/sally
 ADD glide.yaml /go/src/go.uber.org/sally/
 ADD glide.lock /go/src/go.uber.org/sally/
 RUN glide install
 ADD . /go/src/go.uber.org/sally/
-WORKDIR /go/src/go.uber.org/sally
 CMD ["make", "docker-dev-launch-internal"]
