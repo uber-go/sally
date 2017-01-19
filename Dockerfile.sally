@@ -1,5 +1,4 @@
 FROM scratch
-MAINTAINER pedge@uber.com
 
 EXPOSE 8080
 ADD sally.yaml /
