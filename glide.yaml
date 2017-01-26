@@ -1,4 +1,4 @@
-package: github.com/uber-go/sally
+package: go.uber.org/sally
 import:
 - package: gopkg.in/yaml.v2
 - package: github.com/julienschmidt/httprouter
@@ -6,3 +6,18 @@ import:
 testImport:
 - package: github.com/stretchr/testify
 - package: github.com/yosssi/gohtml
+- package: github.com/golang/lint
+  subpackages:
+    - golint
+- package: golang.org/x/tools
+  subpackages:
+    - go/gcimporter15
+- package: github.com/kisielk/errcheck
+- package: github.com/kisielk/gotool
+- package: honnef.co/go/staticcheck
+  subpackages:
+    - cmd/staticcheck
+- package: honnef.co/go/lint
+  subpackages:
+    - lintutil
+- package: honnef.co/go/ssa

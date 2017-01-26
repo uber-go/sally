@@ -27,7 +27,7 @@ func TempFile(t *testing.T, contents string) (path string, clean func()) {
 	}
 
 	return tmpfile.Name(), func() {
-		os.Remove(tmpfile.Name())
+		_ = os.Remove(tmpfile.Name())
 	}
 }
 
