@@ -25,7 +25,7 @@ install:
 .PHONY: lint
 lint:
 	go install ./vendor/github.com/golang/lint/golint
-	for file in $$(find . -name '*.go' | grep -v '^\./vendor'); do \
+	for file in $(SRCS); do \
 		golint $$file; \
 		if [ -n "$$(golint $$file)" ]; then \
 			exit 1; \
