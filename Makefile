@@ -71,7 +71,7 @@ docker-build-internal:
 	rm -rf _tmp
 	mkdir -p _tmp
 	CGO_ENABLED=0 go build -a -installsuffix cgo -o _tmp/sally $(SRCS)
-	docker build -t uber/sally -f Dockerfile.sally .
+	docker build -t uber/sally -f Dockerfile.scratch .
 
 .PHONY: docker-build
 docker-build: docker-build-dev
