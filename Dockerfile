@@ -9,4 +9,4 @@ WORKDIR /go/src/go.uber.org/sally
 ADD glide.yaml glide.lock /go/src/go.uber.org/sally/
 RUN go get -v github.com/Masterminds/glide && glide install
 ADD . /go/src/go.uber.org/sally/
-CMD ["make", "docker-launch-dev-internal"]
+CMD ["make", "run"]

@@ -77,10 +77,6 @@ docker-build-internal:
 docker-build: docker-build-dev
 	docker run -v /var/run/docker.sock:/var/run/docker.sock uber/sally-dev make docker-build-internal
 
-.PHONY: docker-launch-dev-internal
-docker-launch-dev-internal: install
-	sally
-
 .PHONY: docker-launch-dev
 docker-launch-dev: docker-build-dev
 	docker run -p 8080:8080 uber/sally-dev
@@ -90,5 +86,5 @@ docker-launch: docker-build
 	docker run -p 8080:8080 uber/sally
 
 .PHONY: install
-launch: install
+run: install
 	sally
