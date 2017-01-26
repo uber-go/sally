@@ -6,10 +6,7 @@ all: test
 
 .PHONY: vendor-update
 vendor-update:
-	rm -rf vendor
-	go get -d -v -t -u -f ./...
 	go get -v github.com/Masterminds/glide
-	glide create
 	glide update
 
 .PHONY: vendor-install
@@ -27,7 +24,7 @@ install:
 
 .PHONY: lint
 lint:
-	go get -v github.com/golang/lint/golint
+	go install ./vendor/github.com/golang/lint/golint
 	for file in $$(find . -name '*.go' | grep -v '^\./vendor'); do \
 		golint $$file; \
 		if [ -n "$$(golint $$file)" ]; then \
@@ -41,13 +38,13 @@ vet:
 
 .PHONY: errcheck
 errcheck:
-	go get -v github.com/kisielk/errcheck
+	go install ./vendor/github.com/kisielk/errcheck
 	errcheck $(PKGS)
 
 .PHONY: staticcheck
 staticcheck:
-	go get -v honnef.co/go/staticcheck/cmd/staticcheck
-	staticcheck ./...
+	go install ./vendor/honnef.co/go/staticcheck/cmd/staticcheck
+	staticcheck $(PKGS)
 
 .PHONY: pretest
 pretest: lint vet errcheck staticcheck
