@@ -1,5 +1,5 @@
 PKGS := $(shell go list ./... | grep -v go.uber.org/sally/vendor)
-SRCS := $(wildcard *.go)
+SRCS := $(wildcard *.go) $(wildcard cmd/sally/*.go)
 
 .PHONY: all
 all: test
