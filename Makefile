@@ -1,5 +1,6 @@
 PKGS := $(shell go list ./... | grep -v go.uber.org/sally/vendor)
-SRCS := $(wildcard *.go)
+SRCS := $(wildcard *.go) $(wildcard cmd/sally/*.go)
+MAIN_SRCS := $(wildcard cmd/sally/*.go)
 
 .PHONY: all
 all: test
@@ -70,7 +71,7 @@ docker-test: docker-build-dev
 docker-build-internal:
 	rm -rf _tmp
 	mkdir -p _tmp
-	CGO_ENABLED=0 go build -a -installsuffix cgo -o _tmp/sally $(SRCS)
+	CGO_ENABLED=0 go build -a -installsuffix cgo -o _tmp/sally $(MAIN_SRCS)
 	docker build -t uber/sally -f Dockerfile.scratch .
 
 .PHONY: docker-build

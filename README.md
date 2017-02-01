@@ -4,7 +4,7 @@ A tiny HTTP server for supporting custom Golang import paths
 
 ## Installation
 
-`go get go.uber.org/sally`
+`go get go.uber.org/sally/cmd/sally`
 
 ## Usage
 
