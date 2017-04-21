@@ -14,7 +14,7 @@ testImport:
     - go/gcimporter15
 - package: github.com/kisielk/errcheck
 - package: github.com/kisielk/gotool
-- package: honnef.co/go/staticcheck
+- package: honnef.co/go/tools
   subpackages:
     - cmd/staticcheck
 - package: honnef.co/go/lint

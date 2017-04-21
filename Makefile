@@ -43,7 +43,7 @@ errcheck:
 
 .PHONY: staticcheck
 staticcheck:
-	go install ./vendor/honnef.co/go/staticcheck/cmd/staticcheck
+	go install ./vendor/honnef.co/go/tools/cmd/staticcheck
 	staticcheck $(PKGS)
 
 .PHONY: pretest
