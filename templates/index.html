@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <table class="u-full-width">
+                    <thead>
+                        <tr>
+                            <th>Package</th>
+                            <th>Source</th>
+                            <th>Documentation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ range $key, $value := .Packages }}
+                        {{ $importPath := printf "%v/%v" $.URL $key }}
+                        <tr>
+                            <td>{{ $importPath }}</td>
+                            <td>
+                                <a href="//{{ $value.Repo }}">{{ $value.Repo }}</a>
+                            </td>
+                            <td>
+                                <a href="//godoc.org/{{ $importPath }}">
+                                    <img src="//godoc.org/{{ $importPath }}?status.svg" alt="GoDoc" />
+                                </a>
+                            </td>
+                        </tr>
+                        {{ end }}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>
