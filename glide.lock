@@ -1,49 +1,43 @@
-hash: 3d2dd61fbbbb3bcac1d8a9705f3490cf3d7ccc31147ec01662b78a81881ca5a2
-updated: 2017-01-26T13:58:37.214672796+01:00
+hash: f5c47d20486f8bbe6bbd77ef06c41209229aab49601a6671a432c24dce1ed830
+updated: 2018-12-31T11:25:19.957346842-08:00
 imports:
 - name: github.com/julienschmidt/httprouter
-  version: 8c199fb6259ffc1af525cc3ad52ee60ba8359669
+  version: 348b672cd90d8190f8240323e372ecd1e66b59dc
 - name: gopkg.in/yaml.v2
-  version: a83829b6f1293c91addabc89d0571c246397bbf4
+  version: 51d6538a90f86fe93ac480b35f37b2be17fef232
 testImports:
 - name: github.com/davecgh/go-spew
-  version: 04cdfd42973bb9c8589fd6a731800cf222fde1a9
+  version: d8f796af33cc11cb798c1aaeb27a4ebc5099927d
   subpackages:
   - spew
 - name: github.com/golang/lint
-  version: 3390df4df2787994aea98de825b964ac7944b817
+  version: 8f45f776aaf18cebc8d65861cc70c33c60471952
   subpackages:
   - golint
 - name: github.com/kisielk/errcheck
-  version: db0ca22445717d1b2c51ac1034440e0a2a2de645
+  version: 1787c4bee836470bf45018cfbc783650db3c6501
 - name: github.com/kisielk/gotool
-  version: 0de1eaf82fa3f583ce21fde859f1e7e0c5e9b220
+  version: 80517062f582ea3340cd4baf70e86d539ae7d84d
 - name: github.com/pmezard/go-difflib
-  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  version: 5d4384ee4fb2527b0a1256a821ebfc92f91efefc
   subpackages:
   - difflib
 - name: github.com/stretchr/testify
-  version: 18a02ba4a312f95da08ff4cfc0055750ce50ae9e
+  version: 660f15d67dbb878de0d9d79894f728d691c91b91
   subpackages:
   - assert
 - name: github.com/yosssi/gohtml
-  version: ccf383eafddde21dfe37c6191343813822b30e6b
+  version: 97fbf36f4aa81f723d0530f5495a820ba267ae5f
 - name: golang.org/x/net
-  version: 3b993948b6f0e651ffb58ba135d8538a68b1cddf
+  version: 640f4622ab692b87c2f3a94265e6f579fe38263d
   subpackages:
   - html
   - html/atom
 - name: golang.org/x/tools
-  version: 0db92ca630c08f00e3ba4b5abea93836ca04b42e
+  version: 4e70a1b26a7875f00ca1916637a876b5ffaeec59
   subpackages:
   - go/gcimporter15
-- name: honnef.co/go/lint
-  version: 8807103a5c828099e06f52d70faa05575d24869f
-  subpackages:
-  - lintutil
-- name: honnef.co/go/ssa
-  version: 1cf7f34afde4f3f9cb9f7b15f8f2727ebcaa179a
-- name: honnef.co/go/staticcheck
-  version: b48330f1ed0dd7463407767da164e7f3ee43ad76
+- name: honnef.co/go/tools
+  version: e3ad64cb4ed3e25a30bf42def711f9cb5b004f72
   subpackages:
   - cmd/staticcheck
