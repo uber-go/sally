@@ -8,6 +8,18 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+var indexTemplate, packageTemplate *template.Template
+
+func init() {
+	tmpls := template.Must(template.ParseGlob("templates/*.html"))
+	if indexTemplate = tmpls.Lookup("index.html"); indexTemplate == nil {
+		panic("Missing index.html template")
+	}
+	if packageTemplate = tmpls.Lookup("package.html"); packageTemplate == nil {
+		panic("Missing package.html template")
+	}
+}
+
 // CreateHandler creates a Sally http.Handler
 func CreateHandler(config *Config) http.Handler {
 	router := httprouter.New()
@@ -38,19 +50,6 @@ func (h indexHandler) Handle(w http.ResponseWriter, r *http.Request, _ httproute
 	}
 }
 
-var indexTemplate = template.Must(template.New("index").Parse(`
-<!DOCTYPE html>
-<html>
-    <body>
-        <ul>
-            {{ range $key, $value := .Packages }}
-	  	        <li>{{ $key }} - {{ $value.Repo }}</li>
-	        {{ end }}
-        </ul>
-    </body>
-</html>
-`))
-
 type packageHandler struct {
 	pkgName string
 	pkg     Package
@@ -72,17 +71,3 @@ func (h packageHandler) Handle(w http.ResponseWriter, r *http.Request, ps httpro
 		http.Error(w, err.Error(), 500)
 	}
 }
-
-var packageTemplate = template.Must(template.New("package").Parse(`
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta name="go-import" content="{{ .CanonicalURL }} git https://{{ .Repo }}">
-        <meta name="go-source" content="{{ .CanonicalURL }} https://{{ .Repo }} https://{{ .Repo }}/tree/master{/dir} https://{{ .Repo }}/tree/master{/dir}/{file}#L{line}">
-        <meta http-equiv="refresh" content="0; url={{ .GodocURL }}">
-    </head>
-    <body>
-        Nothing to see here. Please <a href="{{ .GodocURL }}">move along</a>.
-    </body>
-</html>
-`))
