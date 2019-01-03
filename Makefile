@@ -1,3 +1,6 @@
+GOLINT = go run github.com/golang/lint/golint
+STATICCHECK = go run honnef.co/go/tools/cmd/staticcheck
+
 .PHONY: all
 all: test
 
@@ -11,8 +14,7 @@ install:
 
 .PHONY: lint
 lint:
-	go install github.com/golang/lint/golint
-	golint ./...
+	$(GOLINT) ./...
 
 .PHONY: vet
 vet:
@@ -20,8 +22,7 @@ vet:
 
 .PHONY: staticcheck
 staticcheck:
-	go install honnef.co/go/tools/cmd/staticcheck
-	staticcheck -tests=false ./...
+	$(STATICCHECK) -tests=false ./...
 
 .PHONY: pretest
 pretest: lint vet staticcheck
