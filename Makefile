@@ -10,7 +10,9 @@ build:
 	go build
 
 .PHONY: generate
-generate:
+generate: bindata.go
+
+bindata.go: templates/*
 	$(GOBINDATA) templates
 
 .PHONY: install
