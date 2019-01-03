@@ -7,7 +7,6 @@ require (
 	github.com/kisielk/gotool v1.0.0 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/stretchr/objx v0.1.1 // indirect
 	github.com/stretchr/testify v1.2.2
 	github.com/yosssi/gohtml v0.0.0-20180130040904-97fbf36f4aa8
 	golang.org/x/lint v0.0.0-20181217174547-8f45f776aaf1 // indirect
