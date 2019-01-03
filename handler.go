@@ -8,17 +8,12 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-var indexTemplate, packageTemplate *template.Template
-
-func init() {
-	tmpls := template.Must(template.ParseGlob("templates/*.html"))
-	if indexTemplate = tmpls.Lookup("index.html"); indexTemplate == nil {
-		panic("Missing index.html template")
-	}
-	if packageTemplate = tmpls.Lookup("package.html"); packageTemplate == nil {
-		panic("Missing package.html template")
-	}
-}
+var (
+	indexTemplate = template.Must(
+		template.New("index.html").Parse(string(MustAsset("templates/index.html"))))
+	packageTemplate = template.Must(
+		template.New("package.html").Parse(string(MustAsset("templates/package.html"))))
+)
 
 // CreateHandler creates a Sally http.Handler
 func CreateHandler(config *Config) http.Handler {

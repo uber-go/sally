@@ -3,5 +3,4 @@ FROM scratch
 EXPOSE 8080
 ADD sally.yaml /
 ADD _tmp/sally /
-ADD templates /templates
 ENTRYPOINT ["/sally"]
