@@ -2,6 +2,7 @@ module go.uber.org/sally
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/go-bindata/go-bindata v1.0.0
 	github.com/golang/lint v0.0.0-20181217174547-8f45f776aaf1
 	github.com/julienschmidt/httprouter v1.2.0
 	github.com/kisielk/gotool v1.0.0 // indirect

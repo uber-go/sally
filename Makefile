@@ -1,5 +1,6 @@
 GOLINT = go run github.com/golang/lint/golint
 STATICCHECK = go run honnef.co/go/tools/cmd/staticcheck
+GOBINDATA = go run github.com/go-bindata/go-bindata/go-bindata
 
 .PHONY: all
 all: test
@@ -7,6 +8,10 @@ all: test
 .PHONY: build
 build:
 	go build
+
+.PHONY: generate
+generate:
+	$(GOBINDATA) templates
 
 .PHONY: install
 install:

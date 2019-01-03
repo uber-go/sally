@@ -1,6 +1,10 @@
 package main
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 var config = `
 
@@ -15,17 +19,11 @@ packages:
 
 func TestIndex(t *testing.T) {
 	rr := CallAndRecord(t, config, "/")
-	AssertResponse(t, rr, 200, `
-<!DOCTYPE html>
-<html>
-    <body>
-        <ul>
-            <li>thriftrw - github.com/thriftrw/thriftrw-go</li>
-            <li>yarpc - github.com/yarpc/yarpc-go</li>
-        </ul>
-    </body>
-</html>
-`)
+	assert.Equal(t, 200, rr.Code)
+
+	body := rr.Body.String()
+	assert.Contains(t, body, "github.com/thriftrw/thriftrw-go")
+	assert.Contains(t, body, "github.com/yarpc/yarpc-go")
 }
 
 func TestPackageShouldExist(t *testing.T) {
