@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"sort"
+	"strings"
 
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 // Config represents the structure of the yaml file
 type Config struct {
-	URL      string             `yaml:"url"`
-	Packages map[string]Package `yaml:"packages"`
+	URL         string             `yaml:"url"`
+	Packages    map[string]Package `yaml:"packages"`
+	GodocServer string             `yaml:"godocServer"`
 }
 
 // Package details the options available for each repo
@@ -57,6 +59,12 @@ func Parse(path string) (*Config, error) {
 
 	if !ensureAlphabetical(data) {
 		return nil, fmt.Errorf("packages in %s must be alphabetically ordered", path)
+	}
+
+	if c.GodocServer == "" {
+		c.GodocServer = "https://godoc.org"
+	} else if strings.HasSuffix(c.GodocServer, "/") {
+		return nil, fmt.Errorf("godoc server address should not end up with a slash")
 	}
 
 	return &c, err

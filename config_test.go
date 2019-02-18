@@ -20,12 +20,52 @@ packages:
 	config, err := Parse(path)
 	assert.NoError(t, err)
 
+	assert.Equal(t, config.GodocServer, "https://godoc.org")
 	assert.Equal(t, config.URL, "google.golang.org")
 
 	pkg, ok := config.Packages["grpc"]
 	assert.True(t, ok)
 
 	assert.Equal(t, pkg, Package{Repo: "github.com/grpc/grpc-go"})
+}
+
+func TestParseValidCustomGodocServer(t *testing.T) {
+	path, clean := TempFile(t, `
+
+godocServer: https://internal.com
+url: google.golang.org
+packages:
+  grpc:
+    repo: github.com/grpc/grpc-go
+
+`)
+	defer clean()
+
+	config, err := Parse(path)
+	assert.NoError(t, err)
+	assert.Equal(t, config.GodocServer, "https://internal.com")
+	assert.Equal(t, config.URL, "google.golang.org")
+
+	pkg, ok := config.Packages["grpc"]
+	assert.True(t, ok)
+
+	assert.Equal(t, pkg, Package{Repo: "github.com/grpc/grpc-go"})
+}
+
+func TestParseInvalidCustomGodocServer(t *testing.T) {
+	path, clean := TempFile(t, `
+
+godocServer: https://internal.com/
+url: google.golang.org
+packages:
+  grpc:
+    repo: github.com/grpc/grpc-go
+
+`)
+	defer clean()
+
+	_, err := Parse(path)
+	assert.Error(t, err)
 }
 
 func TestNotAlphabetical(t *testing.T) {
