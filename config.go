@@ -65,8 +65,8 @@ func Parse(path string) (*Config, error) {
 
 	if c.GodocServer == "" {
 		c.GodocServer = _defaultGodocServer
-	} else if strings.HasSuffix(c.GodocServer, "/") {
-		return nil, fmt.Errorf("godoc server address should not end up with a slash")
+	} else {
+		c.GodocServer = strings.TrimSuffix(c.GodocServer, "/")
 	}
 
 	return &c, err
