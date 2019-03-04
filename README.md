@@ -11,7 +11,12 @@ A tiny HTTP server for supporting custom Golang import paths
 Create a YAML file with the following structure:
 
 ```yaml
-godocServer: https://godoc.org # if empty, this is the value that gonna be set
+# godocServer specifies the instance of godoc.org to use
+# for documentation links.
+#
+# This field defaults to https://godoc.org if omitted.
+godocServer: https://godoc.org
+
 url: google.golang.org
 packages:
   grpc:
