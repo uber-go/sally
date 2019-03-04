@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestParse(t *testing.T) {
@@ -20,7 +22,7 @@ packages:
 	config, err := Parse(path)
 	assert.NoError(t, err)
 
-	assert.Equal(t, config.GodocServer, "https://godoc.org")
+	assert.Equal(t, config.GodocServer, "godoc.org")
 	assert.Equal(t, config.URL, "google.golang.org")
 
 	pkg, ok := config.Packages["grpc"]
@@ -29,44 +31,39 @@ packages:
 	assert.Equal(t, pkg, Package{Repo: "github.com/grpc/grpc-go"})
 }
 
-func TestParseValidCustomGodocServer(t *testing.T) {
-	path, clean := TempFile(t, `
+func TestParseGodocServer(t *testing.T) {
+	tests := []struct {
+		give string
+		want string
+	}{
+		{"example.com", "example.com"},
+		{"example.com/", "example.com"},
+		{"http://example.com/", "example.com"},
+		{"https://example.com/", "example.com"},
+	}
 
-godocServer: https://internal.com
+	for _, tt := range tests {
+		t.Run(tt.give, func(t *testing.T) {
+			path, clean := TempFile(t, fmt.Sprintf(`
+godocServer: %q
 url: google.golang.org
 packages:
   grpc:
     repo: github.com/grpc/grpc-go
+`, tt.give))
+			defer clean()
 
-`)
-	defer clean()
+			config, err := Parse(path)
+			require.NoError(t, err)
 
-	config, err := Parse(path)
-	assert.NoError(t, err)
-	assert.Equal(t, config.GodocServer, "https://internal.com")
-	assert.Equal(t, config.URL, "google.golang.org")
+			assert.Equal(t, tt.want, config.GodocServer)
+			assert.Equal(t, "google.golang.org", config.URL)
 
-	pkg, ok := config.Packages["grpc"]
-	assert.True(t, ok)
-
-	assert.Equal(t, pkg, Package{Repo: "github.com/grpc/grpc-go"})
-}
-
-func TestParseCustomGodocServerTrailingSlash(t *testing.T) {
-	path, clean := TempFile(t, `
-
-godocServer: https://internal.com/
-url: google.golang.org
-packages:
-  grpc:
-    repo: github.com/grpc/grpc-go
-
-`)
-	defer clean()
-
-	cfg, err := Parse(path)
-	assert.NoError(t, err)
-	assert.Equal(t, "https://internal.com", cfg.GodocServer)
+			pkg, ok := config.Packages["grpc"]
+			assert.True(t, ok)
+			assert.Equal(t, Package{Repo: "github.com/grpc/grpc-go"}, pkg)
+		})
+	}
 }
 
 func TestNotAlphabetical(t *testing.T) {

@@ -15,7 +15,7 @@ Create a YAML file with the following structure:
 # for documentation links.
 #
 # This field defaults to https://godoc.org if omitted.
-godocServer: https://godoc.org
+godocServer: godoc.org
 
 url: google.golang.org
 packages:
