@@ -9,6 +9,8 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+const _defaultGodocServer = "https://godoc.org"
+
 // Config represents the structure of the yaml file
 type Config struct {
 	URL         string             `yaml:"url"`
@@ -62,7 +64,7 @@ func Parse(path string) (*Config, error) {
 	}
 
 	if c.GodocServer == "" {
-		c.GodocServer = "https://godoc.org"
+		c.GodocServer = _defaultGodocServer
 	} else if strings.HasSuffix(c.GodocServer, "/") {
 		return nil, fmt.Errorf("godoc server address should not end up with a slash")
 	}
