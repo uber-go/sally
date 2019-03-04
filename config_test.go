@@ -52,7 +52,7 @@ packages:
 	assert.Equal(t, pkg, Package{Repo: "github.com/grpc/grpc-go"})
 }
 
-func TestParseInvalidCustomGodocServer(t *testing.T) {
+func TestParseCustomGodocServerTrailingSlash(t *testing.T) {
 	path, clean := TempFile(t, `
 
 godocServer: https://internal.com/
@@ -64,8 +64,9 @@ packages:
 `)
 	defer clean()
 
-	_, err := Parse(path)
-	assert.Error(t, err)
+	cfg, err := Parse(path)
+	assert.NoError(t, err)
+	assert.Equal(t, "https://internal.com", c.GodocServer)
 }
 
 func TestNotAlphabetical(t *testing.T) {
