@@ -66,7 +66,7 @@ packages:
 
 	cfg, err := Parse(path)
 	assert.NoError(t, err)
-	assert.Equal(t, "https://internal.com", c.GodocServer)
+	assert.Equal(t, "https://internal.com", cfg.GodocServer)
 }
 
 func TestNotAlphabetical(t *testing.T) {
