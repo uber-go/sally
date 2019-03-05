@@ -23,8 +23,8 @@
                                 <a href="//{{ $value.Repo }}">{{ $value.Repo }}</a>
                             </td>
                             <td>
-                                <a href="//godoc.org/{{ $importPath }}">
-                                    <img src="//godoc.org/{{ $importPath }}?status.svg" alt="GoDoc" />
+                                <a href="//{{ $.Godoc.Host }}/{{ $importPath }}">
+                                    <img src="//{{ $.Godoc.Host }}/{{ $importPath }}?status.svg" alt="GoDoc" />
                                 </a>
                             </td>
                         </tr>

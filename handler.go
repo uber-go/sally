@@ -60,7 +60,7 @@ func (h packageHandler) Handle(w http.ResponseWriter, r *http.Request, ps httpro
 	}{
 		Repo:         h.pkg.Repo,
 		CanonicalURL: canonicalURL,
-		GodocURL:     fmt.Sprintf("https://godoc.org/%s%s", canonicalURL, ps.ByName("path")),
+		GodocURL:     fmt.Sprintf("https://%s/%s%s", h.config.Godoc.Host, canonicalURL, ps.ByName("path")),
 	}
 	if err := packageTemplate.Execute(w, data); err != nil {
 		http.Error(w, err.Error(), 500)
