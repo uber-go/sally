@@ -13,9 +13,11 @@ const _defaultGodocServer = "godoc.org"
 
 // Config represents the structure of the yaml file
 type Config struct {
-	URL         string             `yaml:"url"`
-	Packages    map[string]Package `yaml:"packages"`
-	GodocServer string             `yaml:"godocServer"`
+	URL      string             `yaml:"url"`
+	Packages map[string]Package `yaml:"packages"`
+	Godoc    struct {
+		Host string `yaml:"host"`
+	} `yaml:"godoc"`
 }
 
 // Package details the options available for each repo
@@ -63,12 +65,14 @@ func Parse(path string) (*Config, error) {
 		return nil, fmt.Errorf("packages in %s must be alphabetically ordered", path)
 	}
 
-	if c.GodocServer == "" {
-		c.GodocServer = _defaultGodocServer
+	if c.Godoc.Host == "" {
+		c.Godoc.Host = _defaultGodocServer
 	} else {
-		c.GodocServer = strings.TrimPrefix(c.GodocServer, "https://")
-		c.GodocServer = strings.TrimPrefix(c.GodocServer, "http://")
-		c.GodocServer = strings.TrimSuffix(c.GodocServer, "/")
+		host := c.Godoc.Host
+		host = strings.TrimPrefix(host, "https://")
+		host = strings.TrimPrefix(host, "http://")
+		host = strings.TrimSuffix(host, "/")
+		c.Godoc.Host = host
 	}
 
 	return &c, err

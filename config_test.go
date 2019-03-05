@@ -22,7 +22,7 @@ packages:
 	config, err := Parse(path)
 	assert.NoError(t, err)
 
-	assert.Equal(t, config.GodocServer, "godoc.org")
+	assert.Equal(t, config.Godoc.Host, "godoc.org")
 	assert.Equal(t, config.URL, "google.golang.org")
 
 	pkg, ok := config.Packages["grpc"]
@@ -45,7 +45,8 @@ func TestParseGodocServer(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.give, func(t *testing.T) {
 			path, clean := TempFile(t, fmt.Sprintf(`
-godocServer: %q
+godoc:
+  host: %q
 url: google.golang.org
 packages:
   grpc:
@@ -56,7 +57,7 @@ packages:
 			config, err := Parse(path)
 			require.NoError(t, err)
 
-			assert.Equal(t, tt.want, config.GodocServer)
+			assert.Equal(t, tt.want, config.Godoc.Host)
 			assert.Equal(t, "google.golang.org", config.URL)
 
 			pkg, ok := config.Packages["grpc"]
