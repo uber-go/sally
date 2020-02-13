@@ -9,7 +9,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-const _defaultGodocServer = "godoc.org"
+const _defaultGodocServer = "pkg.go.dev"
 
 // Config represents the structure of the yaml file
 type Config struct {
@@ -27,7 +27,7 @@ type Package struct {
 
 // ensureAlphabetical checks that the packages are listed alphabetically in the configuration.
 func ensureAlphabetical(data []byte) bool {
-	// A yaml.MapSlice perservers ordering of keys: https://godoc.org/gopkg.in/yaml.v2#MapSlice
+	// A yaml.MapSlice perservers ordering of keys: https://pkg.go.dev/gopkg.in/yaml.v2#MapSlice
 	var c struct {
 		Packages yaml.MapSlice `yaml:"packages"`
 	}
