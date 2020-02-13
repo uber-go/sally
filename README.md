@@ -13,8 +13,8 @@ Create a YAML file with the following structure:
 ```yaml
 # This optional section configures godoc documentation linking.
 godoc:
-  # Instance of godoc.org used for documentation links. Defaults to godoc.org.
-  host: godoc.org
+  # Instance of godoc server used for documentation links. Defaults to pkg.go.dev.
+  host: pkg.go.dev
 
 url: google.golang.org
 packages:

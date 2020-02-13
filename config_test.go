@@ -22,7 +22,7 @@ packages:
 	config, err := Parse(path)
 	assert.NoError(t, err)
 
-	assert.Equal(t, config.Godoc.Host, "godoc.org")
+	assert.Equal(t, config.Godoc.Host, "pkg.go.dev")
 	assert.Equal(t, config.URL, "google.golang.org")
 
 	pkg, ok := config.Packages["grpc"]

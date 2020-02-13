@@ -6,8 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Added support configuring the godoc.org instance used for documentation
-  links.
+- Support configuring the godoc server used for documentation links.
+
+### Changed
+- Updated default godoc server from `https://godoc.org` to `https://pkg.go.dev`.
 
 ## [1.0.1] - 2019-01-03
 ### Fixed
