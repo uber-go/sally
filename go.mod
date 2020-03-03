@@ -1,7 +1,5 @@
 module go.uber.org/sally
 
-go 1.14
-
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-bindata/go-bindata v1.0.0
