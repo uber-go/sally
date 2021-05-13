@@ -10,6 +10,7 @@ import (
 )
 
 const _defaultGodocServer = "pkg.go.dev"
+const _defaultBranch = "master"
 
 // Config represents the structure of the yaml file
 type Config struct {
@@ -22,7 +23,8 @@ type Config struct {
 
 // Package details the options available for each repo
 type Package struct {
-	Repo string `yaml:"repo"`
+	Repo   string `yaml:"repo"`
+	Branch string `yaml:"branch"`
 }
 
 // ensureAlphabetical checks that the packages are listed alphabetically in the configuration.
@@ -73,6 +75,15 @@ func Parse(path string) (*Config, error) {
 		host = strings.TrimPrefix(host, "http://")
 		host = strings.TrimSuffix(host, "/")
 		c.Godoc.Host = host
+	}
+
+	// set default branch
+	for v := range c.Packages {
+		p := c.Packages[v]
+		if p.Branch == "" {
+			p.Branch = _defaultBranch
+			c.Packages[v] = p
+		}
 	}
 
 	return &c, err
