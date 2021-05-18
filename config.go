@@ -78,8 +78,7 @@ func Parse(path string) (*Config, error) {
 	}
 
 	// set default branch
-	for v := range c.Packages {
-		p := c.Packages[v]
+	for v, p := range c.Packages {
 		if p.Branch == "" {
 			p.Branch = _defaultBranch
 			c.Packages[v] = p

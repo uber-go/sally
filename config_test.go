@@ -15,6 +15,7 @@ url: google.golang.org
 packages:
   grpc:
     repo: github.com/grpc/grpc-go
+    branch: main
 
 `)
 	defer clean()
@@ -28,7 +29,26 @@ packages:
 	pkg, ok := config.Packages["grpc"]
 	assert.True(t, ok)
 
-	assert.Equal(t, pkg, Package{Repo: "github.com/grpc/grpc-go"})
+	assert.Equal(t, pkg, Package{Repo: "github.com/grpc/grpc-go", Branch: "main"})
+}
+
+func TestParseDefaultBranch(t *testing.T) {
+	path, clean := TempFile(t, `
+
+url: google.golang.org
+packages:
+  grpc:
+    repo: github.com/grpc/grpc-go
+
+`)
+	defer clean()
+
+	config, err := Parse(path)
+	assert.NoError(t, err)
+
+	pkg, ok := config.Packages["grpc"]
+	assert.True(t, ok)
+	assert.Equal(t, pkg, Package{Repo: "github.com/grpc/grpc-go", Branch: "master"})
 }
 
 func TestParseGodocServer(t *testing.T) {
