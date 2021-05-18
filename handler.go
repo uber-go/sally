@@ -55,10 +55,12 @@ func (h packageHandler) Handle(w http.ResponseWriter, r *http.Request, ps httpro
 	canonicalURL := fmt.Sprintf("%s/%s", h.config.URL, h.pkgName)
 	data := struct {
 		Repo         string
+		Branch       string
 		CanonicalURL string
 		GodocURL     string
 	}{
 		Repo:         h.pkg.Repo,
+		Branch:       h.pkg.Branch,
 		CanonicalURL: canonicalURL,
 		GodocURL:     fmt.Sprintf("https://%s/%s%s", h.config.Godoc.Host, canonicalURL, ps.ByName("path")),
 	}
