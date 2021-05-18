@@ -82,7 +82,7 @@ packages:
 
 			pkg, ok := config.Packages["grpc"]
 			assert.True(t, ok)
-			assert.Equal(t, Package{Repo: "github.com/grpc/grpc-go"}, pkg)
+			assert.Equal(t, Package{Repo: "github.com/grpc/grpc-go", Branch: "master"}, pkg)
 		})
 	}
 }
