@@ -6,13 +6,14 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"go.uber.org/sally/templates"
 )
 
 var (
 	indexTemplate = template.Must(
-		template.New("index.html").Parse(string(MustAsset("templates/index.html"))))
+		template.New("index.html").Parse(templates.Index))
 	packageTemplate = template.Must(
-		template.New("package.html").Parse(string(MustAsset("templates/package.html"))))
+		template.New("package.html").Parse(templates.Package))
 )
 
 // CreateHandler creates a Sally http.Handler
