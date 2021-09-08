@@ -1,4 +1,4 @@
-FROM golang:1.11
+FROM golang:1.17
 
 EXPOSE 8080
 RUN \
