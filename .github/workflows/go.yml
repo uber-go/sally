@@ -30,7 +30,6 @@ jobs:
           ${{ runner.os }}-go-
 
     - name: Lint
-      if: matrix.latest
       run: make lint
 
     - name: Test
