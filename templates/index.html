@@ -17,6 +17,9 @@
                     <tbody>
                         {{ range $key, $value := .Packages }}
                         {{ $importPath := printf "%v/%v" $.URL $key }}
+                        {{ if ne $value.URL "" }}
+                            {{ $importPath = printf "%v/%v" $value.URL $key }}
+                        {{ end }}
                         <tr>
                             <td>{{ $importPath }}</td>
                             <td>
