@@ -54,6 +54,9 @@ type packageHandler struct {
 
 func (h packageHandler) Handle(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	canonicalURL := fmt.Sprintf("%s/%s", h.config.URL, h.pkgName)
+	if h.pkg.URL != "" {
+		canonicalURL = fmt.Sprintf("%s/%s", h.pkg.URL, h.pkgName)
+	}
 	data := struct {
 		Repo         string
 		Branch       string
