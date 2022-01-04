@@ -51,6 +51,26 @@ packages:
 	assert.Equal(t, pkg, Package{Repo: "github.com/grpc/grpc-go", Branch: "master"})
 }
 
+func TestParsePackageLevelURL(t *testing.T) {
+	path, clean := TempFile(t, `
+
+url: google.golang.org
+packages:
+  grpc:
+    repo: github.com/grpc/grpc-go
+    url: go.uber.org
+
+`)
+	defer clean()
+
+	config, err := Parse(path)
+	assert.NoError(t, err)
+
+	pkg, ok := config.Packages["grpc"]
+	assert.True(t, ok)
+	assert.Equal(t, pkg.URL, "go.uber.org")
+}
+
 func TestParseGodocServer(t *testing.T) {
 	tests := []struct {
 		give string

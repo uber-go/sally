@@ -14,6 +14,9 @@ packages:
     repo: github.com/thriftrw/thriftrw-go
   yarpc:
     repo: github.com/yarpc/yarpc-go
+  zap:
+    url: go.uberalt.org
+    repo: github.com/uber-go/zap
 
 `
 
@@ -94,6 +97,23 @@ func TestDeepImports(t *testing.T) {
     </head>
     <body>
         Nothing to see here. Please <a href="https://pkg.go.dev/go.uber.org/yarpc/heehee/hawhaw">move along</a>.
+    </body>
+</html>
+`)
+}
+
+func TestPackageLevelURL(t *testing.T) {
+	rr := CallAndRecord(t, config, "/zap")
+	AssertResponse(t, rr, 200, `
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="go-import" content="go.uberalt.org/zap git https://github.com/uber-go/zap">
+        <meta name="go-source" content="go.uberalt.org/zap https://github.com/uber-go/zap https://github.com/uber-go/zap/tree/master{/dir} https://github.com/uber-go/zap/tree/master{/dir}/{file}#L{line}">
+        <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uberalt.org/zap">
+    </head>
+    <body>
+        Nothing to see here. Please <a href="https://pkg.go.dev/go.uberalt.org/zap">move along</a>.
     </body>
 </html>
 `)
