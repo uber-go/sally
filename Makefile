@@ -1,4 +1,4 @@
-GOLINT = go run github.com/golang/lint/golint
+GOLINT = go run golang.org/x/lint/golint
 STATICCHECK = go run honnef.co/go/tools/cmd/staticcheck
 
 .PHONY: all
@@ -7,9 +7,6 @@ all: test
 .PHONY: build
 build:
 	go build
-
-.PHONY: generate
-generate: bindata.go
 
 .PHONY: install
 install:
