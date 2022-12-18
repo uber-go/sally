@@ -1,39 +1,42 @@
-GOLINT = go run golang.org/x/lint/golint
-STATICCHECK = go run honnef.co/go/tools/cmd/staticcheck
+export GOBIN = $(shell pwd)/bin
+export PATH := $(GOBIN):$(PATH)
+
+GOLINT = bin/golint
+STATICCHECK = bin/staticcheck
+
+TEST_FLAGS ?= -race
 
 .PHONY: all
-all: test
+all: lint install test
 
-.PHONY: build
-build:
-	go build
+.PHONY: lint
+lint: golint staticcheck
+
+.PHONY: staticcheck
+staticcheck: $(STATICCHECK)
+	$(STATICCHECK) ./...
+
+$(STATICCHECK): tools/go.mod
+	cd tools && go install honnef.co/go/tools/cmd/staticcheck
+
+.PHONY: golint
+golint: $(GOLINT)
+	$(GOLINT) ./...
+
+$(GOLINT): tools/go.mod
+	cd tools && go install golang.org/x/lint/golint
 
 .PHONY: install
 install:
 	go install .
 
-.PHONY: lint
-lint:
-	$(GOLINT) ./...
-
-.PHONY: vet
-vet:
-	go vet ./...
-
-.PHONY: staticcheck
-staticcheck:
-	$(STATICCHECK) -tests=false ./...
-
-.PHONY: pretest
-pretest: lint vet staticcheck
-
 .PHONY: test
-test: pretest
-	go test -race ./...
+test:
+	go test $(TEST_FLAGS) ./...
 
 .PHONY: cover
 cover:
-	go test -coverprofile=cover.out -covermode=atomic -coverpkg=./... ./...
+	go test $(TEST_FLAGS) -coverprofile=cover.out -covermode=atomic -coverpkg=./... ./...
 	go tool cover -html=cover.out -o cover.html
 
 .PHONY: clean
