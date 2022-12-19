@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -14,7 +13,7 @@ import (
 // TempFile persists contents and returns the path and a clean func
 func TempFile(t *testing.T, contents string) (path string, clean func()) {
 	content := []byte(contents)
-	tmpfile, err := ioutil.TempFile("", "sally-tmp")
+	tmpfile, err := os.CreateTemp("", "sally-tmp")
 	if err != nil {
 		t.Fatal("Unable to create tmpfile", err)
 	}
