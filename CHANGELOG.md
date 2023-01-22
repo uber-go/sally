@@ -5,7 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- No changes yet.
+### Changed
+- Use a fluid layout for the index page.
+  This renders better on narrow screens.
 
 [Unreleased]: https://github.com/uber-go/sally/compare/v1.2.0...HEAD
 
