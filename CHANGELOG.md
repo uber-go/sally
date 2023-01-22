@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Add an optional `description` field to packages.
+
 ### Changed
 - Use a fluid layout for the index page.
   This renders better on narrow screens.

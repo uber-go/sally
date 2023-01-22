@@ -26,6 +26,8 @@ type Package struct {
 	Repo   string `yaml:"repo"`
 	Branch string `yaml:"branch"`
 	URL    string `yaml:"url"`
+
+	Desc string `yaml:"description"` // plain text only
 }
 
 // ensureAlphabetical checks that the packages are listed alphabetically in the configuration.
