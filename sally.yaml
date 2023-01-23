@@ -3,5 +3,6 @@ url: go.uber.org
 packages:
   thriftrw:
     repo: github.com/thriftrw/thriftrw-go
+    description: A customizable implementation of Thrift.
   yarpc:
     repo: github.com/yarpc/yarpc-go

@@ -47,6 +47,9 @@ packages:
     # Defaults to "master".
     branch: master
 
+    # Optional description of the package.
+    description: A fast, structured-logging library.
+
     # Alternative base URL instead of the value configured at the top-level.
     # This is useful if the same sally instance is
     # hosted behind multiple base URLs.

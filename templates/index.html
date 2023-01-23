@@ -7,6 +7,7 @@
         .separator {
             margin: 0.25em 0;
         }
+        .description { color: #666; }
 
         /* On narrow screens, switch to inline headers. */
         .table-header { display: none; }
@@ -44,6 +45,16 @@
                         </a>
                     </div>
                 </div>
+                {{ with .Desc }}
+                    <div class="row">
+                        <div class="one column">
+                            <!-- indent -->
+                        </div>
+                        <div class="eleven columns description">
+                            {{ . }}
+                        </div>
+                    </div>
+                {{ end }}
             {{ end }}
         </div>
     </body>
