@@ -3,7 +3,6 @@ module go.uber.org/sally
 go 1.18
 
 require (
-	github.com/julienschmidt/httprouter v1.3.0
 	github.com/stretchr/testify v1.8.1
 	github.com/yosssi/gohtml v0.0.0-20180130040904-97fbf36f4aa8
 	gopkg.in/yaml.v2 v2.4.0
