@@ -7,8 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Add an optional `description` field to packages.
-
-### Changed
 - Use a fluid layout for the index page.
   This renders better on narrow screens.
 
