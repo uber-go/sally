@@ -3,38 +3,48 @@
     <head>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
     </head>
+    <style>
+        .separator {
+            margin: 0.25em 0;
+        }
+
+        /* On narrow screens, switch to inline headers. */
+        .table-header { display: none; }
+        .inline-header { font-weight: bold; }
+        @media (min-width: 550px) {
+            .table-header { display: block; }
+            .inline-header { display: none; }
+        }
+    </style>
     <body>
         <div class="container">
-            <div class="row">
-                <table class="u-full-width">
-                    <thead>
-                        <tr>
-                            <th>Package</th>
-                            <th>Source</th>
-                            <th>Documentation</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{ range $key, $value := .Packages }}
-                        {{ $importPath := printf "%v/%v" $.URL $key }}
-                        {{ if ne $value.URL "" }}
-                            {{ $importPath = printf "%v/%v" $value.URL $key }}
-                        {{ end }}
-                        <tr>
-                            <td>{{ $importPath }}</td>
-                            <td>
-                                <a href="//{{ $value.Repo }}">{{ $value.Repo }}</a>
-                            </td>
-                            <td>
-                                <a href="//{{ $.Godoc.Host }}/{{ $importPath }}">
-                                    <img src="//pkg.go.dev/badge/{{ $importPath }}.svg" alt="Go Reference" />
-                                </a>
-                            </td>
-                        </tr>
-                        {{ end }}
-                    </tbody>
-                </table>
+            <div class="row table-header">
+                <div class="five columns"><strong>Package</strong></div>
+                <div class="five columns"><strong>Source</strong></div>
+                <div class="two columns"><strong>Documentation</strong></div>
             </div>
+            {{ range $key, $value := .Packages }}
+                {{ $importPath := printf "%v/%v" $.URL $key }}
+                {{ if ne $value.URL "" }}
+                    {{ $importPath = printf "%v/%v" $value.URL $key }}
+                {{ end }}
+                <hr class="separator">
+                <div class="row">
+                    <div class="five columns">
+                        <span class="inline-header">Package:</span>
+                        {{ $importPath }}
+                    </div>
+                    <div class="five columns">
+                        <span class="inline-header">Source:</span>
+                        <a href="//{{ $value.Repo }}">{{ $value.Repo }}</a>
+                    </div>
+                    <div class="two columns">
+                        <a href="//{{ $.Godoc.Host }}/{{ $importPath }}">
+                            <img src="//pkg.go.dev/badge/{{ $importPath }}.svg" alt="Go Reference" />
+                        </a>
+                    </div>
+                </div>
+            {{ end }}
         </div>
     </body>
 </html>
