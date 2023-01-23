@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strings"
 
-	"github.com/julienschmidt/httprouter"
 	"go.uber.org/sally/templates"
 )
 
@@ -18,29 +18,36 @@ var (
 
 // CreateHandler creates a Sally http.Handler
 func CreateHandler(config *Config) http.Handler {
-	router := httprouter.New()
-	router.RedirectTrailingSlash = false
+	mux := http.NewServeMux()
 
-	router.GET("/", indexHandler{config: config}.Handle)
-
+	mux.Handle("/", &indexHandler{config: config})
 	for name, pkg := range config.Packages {
 		handle := packageHandler{
 			pkgName: name,
 			pkg:     pkg,
 			config:  config,
-		}.Handle
-		router.GET(fmt.Sprintf("/%s", name), handle)
-		router.GET(fmt.Sprintf("/%s/*path", name), handle)
+		}
+		// Double-register so that "/foo"
+		// does not redirect to "/foo/" with a 300.
+		mux.Handle("/"+name, &handle)
+		mux.Handle("/"+name+"/", &handle)
 	}
 
-	return router
+	return mux
 }
 
 type indexHandler struct {
 	config *Config
 }
 
-func (h indexHandler) Handle(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// Index handler only supports '/'.
+	// ServeMux will call us for any '/foo' that is not a known package.
+	if r.Method != http.MethodGet || r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+
 	if err := indexTemplate.Execute(w, h.config); err != nil {
 		http.Error(w, err.Error(), 500)
 	}
@@ -52,7 +59,17 @@ type packageHandler struct {
 	config  *Config
 }
 
-func (h packageHandler) Handle(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (h *packageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Extract the relative path to subpackages, if any.
+	//	"/foo/bar" => "/bar"
+	//	"/foo" => ""
+	relPath := strings.TrimPrefix(r.URL.Path, "/"+h.pkgName)
+
 	baseURL := h.config.URL
 	if h.pkg.URL != "" {
 		baseURL = h.pkg.URL
@@ -67,7 +84,7 @@ func (h packageHandler) Handle(w http.ResponseWriter, r *http.Request, ps httpro
 		Repo:         h.pkg.Repo,
 		Branch:       h.pkg.Branch,
 		CanonicalURL: canonicalURL,
-		GodocURL:     fmt.Sprintf("https://%s/%s%s", h.config.Godoc.Host, canonicalURL, ps.ByName("path")),
+		GodocURL:     fmt.Sprintf("https://%s/%s%s", h.config.Godoc.Host, canonicalURL, relPath),
 	}
 	if err := packageTemplate.Execute(w, data); err != nil {
 		http.Error(w, err.Error(), 500)

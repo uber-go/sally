@@ -1,9 +1,14 @@
 package main
 
 import (
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var config = `
@@ -119,4 +124,45 @@ func TestPackageLevelURL(t *testing.T) {
     </body>
 </html>
 `)
+}
+
+func TestPostRejected(t *testing.T) {
+	t.Parallel()
+
+	h := CreateHandler(&Config{
+		URL: "go.uberalt.org",
+		Packages: map[string]Package{
+			"zap": {
+				Repo: "github.com/uber-go/zap",
+			},
+		},
+	})
+	srv := httptest.NewServer(h)
+	t.Cleanup(srv.Close)
+
+	tests := []struct {
+		desc string
+		path string
+	}{
+		{desc: "index", path: "/"},
+		{desc: "package", path: "/zap"},
+		{desc: "subpackage", path: "/zap/zapcore"},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.desc, func(t *testing.T) {
+			t.Parallel()
+
+			res, err := http.Post(srv.URL+tt.path, "text/plain", strings.NewReader("foo"))
+			require.NoError(t, err)
+			defer res.Body.Close()
+
+			body, err := io.ReadAll(res.Body)
+			require.NoError(t, err)
+
+			assert.Equal(t, http.StatusNotFound, res.StatusCode,
+				"expected 404, got:\n%s", string(body))
+		})
+	}
 }
