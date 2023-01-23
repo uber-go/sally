@@ -4,13 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.3.0]
 ### Added
 - Add an optional `description` field to packages.
+
+### Changed
 - Use a fluid layout for the index page.
   This renders better on narrow screens.
 
-[Unreleased]: https://github.com/uber-go/sally/compare/v1.2.0...HEAD
+[1.3.0]: https://github.com/uber-go/sally/compare/v1.2.0...HEAD
 
 ## [1.2.0] - 2022-05-17
 ### Added
