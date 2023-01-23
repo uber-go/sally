@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use a fluid layout for the index page.
   This renders better on narrow screens.
 
-[1.3.0]: https://github.com/uber-go/sally/compare/v1.2.0...HEAD
+[1.3.0]: https://github.com/uber-go/sally/compare/v1.2.0...v1.3.0
 
 ## [1.2.0] - 2022-05-17
 ### Added
