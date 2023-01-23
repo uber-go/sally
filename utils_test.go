@@ -1,13 +1,16 @@
 package main
 
 import (
+	"bytes"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/yosssi/gohtml"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/net/html"
 )
 
 // TempFile persists contents and returns the path and a clean func
@@ -61,5 +64,14 @@ func CallAndRecord(t *testing.T, config string, uri string) *httptest.ResponseRe
 // AssertResponse normalizes and asserts the body from rr against want
 func AssertResponse(t *testing.T, rr *httptest.ResponseRecorder, code int, want string) {
 	assert.Equal(t, rr.Code, code)
-	assert.Equal(t, gohtml.Format(want), gohtml.Format(rr.Body.String()))
+	assert.Equal(t, reformatHTML(t, want), reformatHTML(t, rr.Body.String()))
+}
+
+func reformatHTML(t *testing.T, s string) string {
+	n, err := html.Parse(strings.NewReader(s))
+	require.NoError(t, err)
+
+	var buff bytes.Buffer
+	require.NoError(t, html.Render(&buff, n))
+	return buff.String()
 }
