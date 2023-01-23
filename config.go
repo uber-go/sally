@@ -26,6 +26,8 @@ type Package struct {
 	Repo   string `yaml:"repo"`
 	Branch string `yaml:"branch"`
 	URL    string `yaml:"url"`
+
+	Desc string `yaml:"description"` // plain text only
 }
 
 // Parse takes a path to a yaml file and produces a parsed Config

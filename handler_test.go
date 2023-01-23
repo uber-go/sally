@@ -17,6 +17,7 @@ packages:
   zap:
     url: go.uberalt.org
     repo: github.com/uber-go/zap
+    description: A fast, structured logging library.
 
 `
 
@@ -27,6 +28,7 @@ func TestIndex(t *testing.T) {
 	body := rr.Body.String()
 	assert.Contains(t, body, "github.com/thriftrw/thriftrw-go")
 	assert.Contains(t, body, "github.com/yarpc/yarpc-go")
+	assert.Contains(t, body, "A fast, structured logging library.")
 }
 
 func TestPackageShouldExist(t *testing.T) {
