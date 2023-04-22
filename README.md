@@ -5,9 +5,14 @@ to serve vanity import paths for Go modules.
 
 ## Installation
 
+To build sally from source, use:
+
 ```bash
 go install go.uber.org/sally@latest
 ```
+
+Alternatively, get a pre-built Docker image from
+https://github.com/uber-go/sally/pkgs/container/sally.
 
 ## Usage
 
