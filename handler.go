@@ -22,15 +22,11 @@ func CreateHandler(config *Config) http.Handler {
 
 	mux.Handle("/", &indexHandler{config: config})
 	for name, pkg := range config.Packages {
-		handle := packageHandler{
-			pkgName: name,
-			pkg:     pkg,
-			config:  config,
-		}
+		handler := newPackageHandler(config, name, pkg)
 		// Double-register so that "/foo"
 		// does not redirect to "/foo/" with a 300.
-		mux.Handle("/"+name, &handle)
-		mux.Handle("/"+name+"/", &handle)
+		mux.Handle("/"+name, handler)
+		mux.Handle("/"+name+"/", handler)
 	}
 
 	return mux
@@ -54,9 +50,38 @@ func (h *indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 type packageHandler struct {
-	pkg     PackageConfig
-	pkgName string
-	config  *Config
+	// Hostname of the godoc server, e.g. "godoc.org".
+	godocHost string
+
+	// Name of the package relative to the vanity base URL.
+	// For example, "zap" for "go.uber.org/zap".
+	name string
+
+	// Path at which the Git repository is hosted.
+	// For example, "github.com/uber-go/zap".
+	gitURL string
+
+	// Default branch of the Git repository.
+	defaultBranch string
+
+	// Canonical import path for the package.
+	canonicalURL string
+}
+
+func newPackageHandler(cfg *Config, name string, pkg PackageConfig) *packageHandler {
+	baseURL := cfg.URL
+	if pkg.URL != "" {
+		baseURL = pkg.URL
+	}
+	canonicalURL := fmt.Sprintf("%s/%s", baseURL, name)
+
+	return &packageHandler{
+		godocHost:     cfg.Godoc.Host,
+		name:          name,
+		canonicalURL:  canonicalURL,
+		gitURL:        pkg.Repo,
+		defaultBranch: pkg.Branch,
+	}
 }
 
 func (h *packageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -68,23 +93,18 @@ func (h *packageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Extract the relative path to subpackages, if any.
 	//	"/foo/bar" => "/bar"
 	//	"/foo" => ""
-	relPath := strings.TrimPrefix(r.URL.Path, "/"+h.pkgName)
+	relPath := strings.TrimPrefix(r.URL.Path, "/"+h.name)
 
-	baseURL := h.config.URL
-	if h.pkg.URL != "" {
-		baseURL = h.pkg.URL
-	}
-	canonicalURL := fmt.Sprintf("%s/%s", baseURL, h.pkgName)
 	data := struct {
 		Repo         string
 		Branch       string
 		CanonicalURL string
 		GodocURL     string
 	}{
-		Repo:         h.pkg.Repo,
-		Branch:       h.pkg.Branch,
-		CanonicalURL: canonicalURL,
-		GodocURL:     fmt.Sprintf("https://%s/%s%s", h.config.Godoc.Host, canonicalURL, relPath),
+		Repo:         h.gitURL,
+		Branch:       h.defaultBranch,
+		CanonicalURL: h.canonicalURL,
+		GodocURL:     fmt.Sprintf("https://%s/%s%s", h.godocHost, h.canonicalURL, relPath),
 	}
 	if err := packageTemplate.Execute(w, data); err != nil {
 		http.Error(w, err.Error(), 500)
