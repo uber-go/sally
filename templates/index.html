@@ -24,24 +24,20 @@
                 <div class="five columns"><strong>Source</strong></div>
                 <div class="two columns"><strong>Documentation</strong></div>
             </div>
-            {{ range $key, $value := .Packages }}
-                {{ $importPath := printf "%v/%v" $.URL $key }}
-                {{ if ne $value.URL "" }}
-                    {{ $importPath = printf "%v/%v" $value.URL $key }}
-                {{ end }}
+            {{ range .Packages }}
                 <hr class="separator">
                 <div class="row">
                     <div class="five columns">
                         <span class="inline-header">Package:</span>
-                        {{ $importPath }}
+                        {{ .ImportPath }}
                     </div>
                     <div class="five columns">
                         <span class="inline-header">Source:</span>
-                        <a href="//{{ $value.Repo }}">{{ $value.Repo }}</a>
+                        <a href="//{{ .GitURL }}">{{ .GitURL }}</a>
                     </div>
                     <div class="two columns">
-                        <a href="//{{ $.Godoc.Host }}/{{ $importPath }}">
-                            <img src="//pkg.go.dev/badge/{{ $importPath }}.svg" alt="Go Reference" />
+                        <a href="//{{ .GodocHome }}">
+                            <img src="//pkg.go.dev/badge/{{ .ImportPath }}.svg" alt="Go Reference" />
                         </a>
                     </div>
                 </div>
