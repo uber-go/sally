@@ -131,7 +131,7 @@ func TestPostRejected(t *testing.T) {
 
 	h := CreateHandler(&Config{
 		URL: "go.uberalt.org",
-		Packages: map[string]Package{
+		Packages: map[string]PackageConfig{
 			"zap": {
 				Repo: "github.com/uber-go/zap",
 			},

@@ -12,22 +12,51 @@ const (
 	_defaultBranch      = "master"
 )
 
-// Config represents the structure of the yaml file
+// Config defines the configuration for a Sally server.
 type Config struct {
-	URL      string             `yaml:"url"`
-	Packages map[string]Package `yaml:"packages"`
-	Godoc    struct {
-		Host string `yaml:"host"`
-	} `yaml:"godoc"`
+	// URL is the base URL for all vanity imports.
+	URL string `yaml:"url"` // required
+
+	// Packages is a map of package name to package details.
+	Packages map[string]PackageConfig `yaml:"packages"`
+
+	// Godoc specifies where to redirect to for documentation.
+	Godoc GodocConfig `yaml:"godoc"`
 }
 
-// Package details the options available for each repo
-type Package struct {
-	Repo   string `yaml:"repo"`
-	Branch string `yaml:"branch"`
-	URL    string `yaml:"url"`
+// GodocConfig is the configuration for the documentation server.
+type GodocConfig struct {
+	// Host is the hostname of the documentation server.
+	//
+	// Defaults to pkg.go.dev.
+	Host string `yaml:"host"`
+}
 
-	Desc string `yaml:"description"` // plain text only
+// PackageConfig is the configuration for a single Go module
+// that is served by Sally.
+type PackageConfig struct {
+	// Repo is the URL to the Git repository for the module
+	// without the https:// prefix.
+	// This URL must serve the Git HTTPS protocol.
+	//
+	// For example, "github.com/uber-go/sally".
+	Repo string `yaml:"repo"` // required
+
+	// Branch is the default branch for the repository
+	// when no version is specified.
+	//
+	// Defaults to master.
+	Branch string `yaml:"branch"`
+	// NB: This is no longer necessary.
+	// https://github.com/uber-go/sally/issues/83
+
+	// URL is the base URL of the vanity import for this module.
+	//
+	// Defaults to the URL specified in the top-level config.
+	URL string `yaml:"url"`
+
+	// Desc is a plain text description of this module.
+	Desc string `yaml:"description"`
 }
 
 // Parse takes a path to a yaml file and produces a parsed Config
