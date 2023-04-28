@@ -2,6 +2,10 @@ export GOBIN = $(shell pwd)/bin
 export PATH := $(GOBIN):$(PATH)
 
 GOLINT = bin/golint
+GO_FILES = $(shell find . \
+	   -path '*/.*' -prune -o \
+	   '(' -type f -a -name '*.go' ')' -print)
+
 STATICCHECK = bin/staticcheck
 
 TEST_FLAGS ?= -race
@@ -10,7 +14,15 @@ TEST_FLAGS ?= -race
 all: lint install test
 
 .PHONY: lint
-lint: golint staticcheck
+lint: gofmt golint staticcheck
+
+.PHONY: gofmt
+gofmt:
+	$(eval FMT_LOG := $(shell mktemp -t gofmt.XXXXX))
+	@gofmt -e -s -l $(GO_FILES) > $(FMT_LOG) || true
+	@[ ! -s "$(FMT_LOG)" ] || \
+		(echo "gofmt failed. Please reformat the following files:" | \
+		cat - $(FMT_LOG) && false)
 
 .PHONY: staticcheck
 staticcheck: $(STATICCHECK)
