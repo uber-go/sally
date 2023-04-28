@@ -1,3 +1,5 @@
+// sally is an HTTP service that allows you to serve
+// vanity import paths for your Go packages.
 package main // import "go.uber.org/sally"
 
 import (
