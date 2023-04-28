@@ -54,8 +54,8 @@ func (h *indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 type packageHandler struct {
+	pkg     PackageConfig
 	pkgName string
-	pkg     Package
 	config  *Config
 }
 

@@ -29,7 +29,7 @@ packages:
 	pkg, ok := config.Packages["grpc"]
 	assert.True(t, ok)
 
-	assert.Equal(t, pkg, Package{Repo: "github.com/grpc/grpc-go", Branch: "main"})
+	assert.Equal(t, pkg, PackageConfig{Repo: "github.com/grpc/grpc-go", Branch: "main"})
 }
 
 func TestParseDefaultBranch(t *testing.T) {
@@ -48,7 +48,7 @@ packages:
 
 	pkg, ok := config.Packages["grpc"]
 	assert.True(t, ok)
-	assert.Equal(t, pkg, Package{Repo: "github.com/grpc/grpc-go", Branch: "master"})
+	assert.Equal(t, pkg, PackageConfig{Repo: "github.com/grpc/grpc-go", Branch: "master"})
 }
 
 func TestParsePackageLevelURL(t *testing.T) {
@@ -102,7 +102,7 @@ packages:
 
 			pkg, ok := config.Packages["grpc"]
 			assert.True(t, ok)
-			assert.Equal(t, Package{Repo: "github.com/grpc/grpc-go", Branch: "master"}, pkg)
+			assert.Equal(t, PackageConfig{Repo: "github.com/grpc/grpc-go", Branch: "master"}, pkg)
 		})
 	}
 }
