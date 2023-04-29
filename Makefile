@@ -1,8 +1,13 @@
 export GOBIN = $(shell pwd)/bin
 export PATH := $(GOBIN):$(PATH)
 
-GOLINT = bin/golint
+GO_FILES = $(shell find . \
+	   -path '*/.*' -prune -o \
+	   '(' -type f -a -name '*.go' ')' -print)
+
+REVIVE = bin/revive
 STATICCHECK = bin/staticcheck
+TOOLS = $(REVIVE) $(STATICCHECK)
 
 TEST_FLAGS ?= -race
 
@@ -10,7 +15,15 @@ TEST_FLAGS ?= -race
 all: lint install test
 
 .PHONY: lint
-lint: golint staticcheck
+lint: gofmt revive staticcheck
+
+.PHONY: gofmt
+gofmt:
+	$(eval FMT_LOG := $(shell mktemp -t gofmt.XXXXX))
+	@gofmt -e -s -l $(GO_FILES) > $(FMT_LOG) || true
+	@[ ! -s "$(FMT_LOG)" ] || \
+		(echo "gofmt failed. Please reformat the following files:" | \
+		cat - $(FMT_LOG) && false)
 
 .PHONY: staticcheck
 staticcheck: $(STATICCHECK)
@@ -19,12 +32,12 @@ staticcheck: $(STATICCHECK)
 $(STATICCHECK): tools/go.mod
 	cd tools && go install honnef.co/go/tools/cmd/staticcheck
 
-.PHONY: golint
-golint: $(GOLINT)
-	$(GOLINT) ./...
+.PHONY: revive
+revive: $(REVIVE)
+	$(REVIVE) -set_exit_status ./...
 
-$(GOLINT): tools/go.mod
-	cd tools && go install golang.org/x/lint/golint
+$(REVIVE): tools/go.mod
+	cd tools && go install github.com/mgechev/revive
 
 .PHONY: install
 install:

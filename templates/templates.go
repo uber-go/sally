@@ -1,3 +1,5 @@
+// Package templates exposes the template used by Sally
+// to render the HTML pages.
 package templates
 
 import _ "embed" // needed for go:embed
