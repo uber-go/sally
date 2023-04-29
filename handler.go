@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"sort"
 	"strings"
 
 	"go.uber.org/sally/templates"
@@ -20,20 +21,38 @@ var (
 func CreateHandler(config *Config) http.Handler {
 	mux := http.NewServeMux()
 
-	mux.Handle("/", &indexHandler{config: config})
+	pkgs := make([]packageInfo, 0, len(config.Packages))
 	for name, pkg := range config.Packages {
 		handler := newPackageHandler(config, name, pkg)
 		// Double-register so that "/foo"
 		// does not redirect to "/foo/" with a 300.
 		mux.Handle("/"+name, handler)
 		mux.Handle("/"+name+"/", handler)
+
+		pkgs = append(pkgs, packageInfo{
+			Desc:       pkg.Desc,
+			ImportPath: handler.canonicalURL,
+			GitURL:     handler.gitURL,
+			GodocHome:  handler.godocHost + "/" + handler.canonicalURL,
+		})
 	}
+	sort.Slice(pkgs, func(i, j int) bool {
+		return pkgs[i].ImportPath < pkgs[j].ImportPath
+	})
+	mux.Handle("/", &indexHandler{pkgs: pkgs})
 
 	return mux
 }
 
 type indexHandler struct {
-	config *Config
+	pkgs []packageInfo
+}
+
+type packageInfo struct {
+	Desc       string // package description
+	ImportPath string // canonical improt path
+	GitURL     string // URL of the Git repository
+	GodocHome  string // documentation home URL
 }
 
 func (h *indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +63,10 @@ func (h *indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := indexTemplate.Execute(w, h.config); err != nil {
+	data := struct{ Packages []packageInfo }{
+		Packages: h.pkgs,
+	}
+	if err := indexTemplate.Execute(w, data); err != nil {
 		http.Error(w, err.Error(), 500)
 	}
 }
