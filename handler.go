@@ -102,7 +102,6 @@ func newPackageHandler(cfg *Config, name string, pkg PackageConfig) *packageHand
 		name:          name,
 		canonicalURL:  canonicalURL,
 		gitURL:        pkg.Repo,
-		defaultBranch: pkg.Branch,
 	}
 }
 
@@ -119,12 +118,10 @@ func (h *packageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	data := struct {
 		Repo         string
-		Branch       string
 		CanonicalURL string
 		GodocURL     string
 	}{
 		Repo:         h.gitURL,
-		Branch:       h.defaultBranch,
 		CanonicalURL: h.canonicalURL,
 		GodocURL:     fmt.Sprintf("https://%s/%s%s", h.godocHost, h.canonicalURL, relPath),
 	}
