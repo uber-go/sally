@@ -50,7 +50,7 @@ type indexHandler struct {
 
 type packageInfo struct {
 	Desc       string // package description
-	ImportPath string // canonical improt path
+	ImportPath string // canonical import path
 	GitURL     string // URL of the Git repository
 	GodocHome  string // documentation home URL
 }
