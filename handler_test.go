@@ -43,7 +43,6 @@ func TestPackageShouldExist(t *testing.T) {
 <html>
     <head>
         <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go">
-        <meta name="go-source" content="go.uber.org/yarpc https://github.com/yarpc/yarpc-go https://github.com/yarpc/yarpc-go/tree/master{/dir} https://github.com/yarpc/yarpc-go/tree/master{/dir}/{file}#L{line}">
         <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc">
     </head>
     <body>
@@ -66,8 +65,7 @@ func TestTrailingSlash(t *testing.T) {
 <!DOCTYPE html>
 <html>
     <head>
-        <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go">
-        <meta name="go-source" content="go.uber.org/yarpc https://github.com/yarpc/yarpc-go https://github.com/yarpc/yarpc-go/tree/master{/dir} https://github.com/yarpc/yarpc-go/tree/master{/dir}/{file}#L{line}">
+        <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go"> 
         <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc/">
     </head>
     <body>
@@ -84,8 +82,7 @@ func TestDeepImports(t *testing.T) {
 <html>
     <head>
         <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go">
-        <meta name="go-source" content="go.uber.org/yarpc https://github.com/yarpc/yarpc-go https://github.com/yarpc/yarpc-go/tree/master{/dir} https://github.com/yarpc/yarpc-go/tree/master{/dir}/{file}#L{line}">
-        <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc/heeheehee">
+		<meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc/heeheehee">
     </head>
     <body>
         Nothing to see here. Please <a href="https://pkg.go.dev/go.uber.org/yarpc/heeheehee">move along</a>.
@@ -99,8 +96,7 @@ func TestDeepImports(t *testing.T) {
 <html>
     <head>
         <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go">
-        <meta name="go-source" content="go.uber.org/yarpc https://github.com/yarpc/yarpc-go https://github.com/yarpc/yarpc-go/tree/master{/dir} https://github.com/yarpc/yarpc-go/tree/master{/dir}/{file}#L{line}">
-        <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc/heehee/hawhaw">
+		<meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc/heehee/hawhaw">
     </head>
     <body>
         Nothing to see here. Please <a href="https://pkg.go.dev/go.uber.org/yarpc/heehee/hawhaw">move along</a>.
@@ -116,8 +112,7 @@ func TestPackageLevelURL(t *testing.T) {
 <html>
     <head>
         <meta name="go-import" content="go.uberalt.org/zap git https://github.com/uber-go/zap">
-        <meta name="go-source" content="go.uberalt.org/zap https://github.com/uber-go/zap https://github.com/uber-go/zap/tree/master{/dir} https://github.com/uber-go/zap/tree/master{/dir}/{file}#L{line}">
-        <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uberalt.org/zap">
+		<meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uberalt.org/zap">
     </head>
     <body>
         Nothing to see here. Please <a href="https://pkg.go.dev/go.uberalt.org/zap">move along</a>.
