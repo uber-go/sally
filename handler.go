@@ -102,6 +102,7 @@ func newPackageHandler(cfg *Config, name string, pkg PackageConfig) *packageHand
 		name:          name,
 		canonicalURL:  canonicalURL,
 		gitURL:        pkg.Repo,
+		defaultBranch: pkg.Branch,
 	}
 }
 
