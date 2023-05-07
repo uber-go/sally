@@ -43,7 +43,7 @@ func TestPackageShouldExist(t *testing.T) {
 <html>
     <head>
         <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go">
-				<meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc">
+        <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc">
     </head>
     <body>
         Nothing to see here. Please <a href="https://pkg.go.dev/go.uber.org/yarpc">move along</a>.
@@ -66,7 +66,7 @@ func TestTrailingSlash(t *testing.T) {
 <html>
     <head>
         <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go">
-				<meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc/">
+        <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc/">
     </head>
     <body>
         Nothing to see here. Please <a href="https://pkg.go.dev/go.uber.org/yarpc/">move along</a>.
@@ -82,7 +82,7 @@ func TestDeepImports(t *testing.T) {
 <html>
     <head>
         <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go">
-				<meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc/heeheehee">
+        <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc/heeheehee">
     </head>
     <body>
         Nothing to see here. Please <a href="https://pkg.go.dev/go.uber.org/yarpc/heeheehee">move along</a>.
@@ -96,7 +96,7 @@ func TestDeepImports(t *testing.T) {
 <html>
     <head>
         <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go">
-				<meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc/heehee/hawhaw">
+        <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc/heehee/hawhaw">
     </head>
     <body>
         Nothing to see here. Please <a href="https://pkg.go.dev/go.uber.org/yarpc/heehee/hawhaw">move along</a>.
@@ -112,7 +112,7 @@ func TestPackageLevelURL(t *testing.T) {
 <html>
     <head>
         <meta name="go-import" content="go.uberalt.org/zap git https://github.com/uber-go/zap">
-				<meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uberalt.org/zap">
+        <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uberalt.org/zap">
     </head>
     <body>
         Nothing to see here. Please <a href="https://pkg.go.dev/go.uberalt.org/zap">move along</a>.
