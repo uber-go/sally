@@ -43,7 +43,7 @@ func TestPackageShouldExist(t *testing.T) {
 <html>
     <head>
         <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go">
-        <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc">
+		<meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc">
     </head>
     <body>
         Nothing to see here. Please <a href="https://pkg.go.dev/go.uber.org/yarpc">move along</a>.
@@ -65,8 +65,8 @@ func TestTrailingSlash(t *testing.T) {
 <!DOCTYPE html>
 <html>
     <head>
-        <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go"> 
-        <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc/">
+        <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go">
+		<meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc/">
     </head>
     <body>
         Nothing to see here. Please <a href="https://pkg.go.dev/go.uber.org/yarpc/">move along</a>.
