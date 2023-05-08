@@ -83,9 +83,6 @@ type packageHandler struct {
 	// For example, "github.com/uber-go/zap".
 	gitURL string
 
-	// Default branch of the Git repository.
-	defaultBranch string
-
 	// Canonical import path for the package.
 	canonicalURL string
 }
@@ -98,11 +95,10 @@ func newPackageHandler(cfg *Config, name string, pkg PackageConfig) *packageHand
 	canonicalURL := fmt.Sprintf("%s/%s", baseURL, name)
 
 	return &packageHandler{
-		godocHost:     cfg.Godoc.Host,
-		name:          name,
-		canonicalURL:  canonicalURL,
-		gitURL:        pkg.Repo,
-		defaultBranch: pkg.Branch,
+		godocHost:    cfg.Godoc.Host,
+		name:         name,
+		canonicalURL: canonicalURL,
+		gitURL:       pkg.Repo,
 	}
 }
 

@@ -9,7 +9,6 @@ import (
 
 const (
 	_defaultGodocServer = "pkg.go.dev"
-	_defaultBranch      = "master"
 )
 
 // Config defines the configuration for a Sally server.
@@ -42,14 +41,6 @@ type PackageConfig struct {
 	// For example, "github.com/uber-go/sally".
 	Repo string `yaml:"repo"` // required
 
-	// Branch is the default branch for the repository
-	// when no version is specified.
-	//
-	// Defaults to master.
-	Branch string `yaml:"branch"`
-	// NB: This is no longer necessary.
-	// https://github.com/uber-go/sally/issues/83
-
 	// URL is the base URL of the vanity import for this module.
 	//
 	// Defaults to the URL specified in the top-level config.
@@ -80,14 +71,6 @@ func Parse(path string) (*Config, error) {
 		host = strings.TrimPrefix(host, "http://")
 		host = strings.TrimSuffix(host, "/")
 		c.Godoc.Host = host
-	}
-
-	// set default branch
-	for v, p := range c.Packages {
-		if p.Branch == "" {
-			p.Branch = _defaultBranch
-			c.Packages[v] = p
-		}
 	}
 
 	return &c, err
