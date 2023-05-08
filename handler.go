@@ -50,7 +50,7 @@ type indexHandler struct {
 
 type packageInfo struct {
 	Desc       string // package description
-	ImportPath string // canonical improt path
+	ImportPath string // canonical import path
 	GitURL     string // URL of the Git repository
 	GodocHome  string // documentation home URL
 }
@@ -119,12 +119,10 @@ func (h *packageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	data := struct {
 		Repo         string
-		Branch       string
 		CanonicalURL string
 		GodocURL     string
 	}{
 		Repo:         h.gitURL,
-		Branch:       h.defaultBranch,
 		CanonicalURL: h.canonicalURL,
 		GodocURL:     fmt.Sprintf("https://%s/%s%s", h.godocHost, h.canonicalURL, relPath),
 	}
