@@ -47,11 +47,6 @@ packages:
     # This field is required.
     repo: github.com/uber-go/zap
 
-    # Branch of the Git repository that you're linking to.
-    #
-    # Defaults to "master".
-    branch: master
-
     # Optional description of the package.
     description: A fast, structured-logging library.
 
