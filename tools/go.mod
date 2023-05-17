@@ -2,7 +2,7 @@ module go.uber.org/sally/tools
 
 require (
 	github.com/mgechev/revive v1.3.2
-	honnef.co/go/tools v0.4.0
+	honnef.co/go/tools v0.4.3
 )
 
 require (
