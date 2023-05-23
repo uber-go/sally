@@ -5,7 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
-- No changes yet.
+### Added
+- Publish a Docker image to GitHub Container Registry.
+  Import it from ghcr.io/uber-go/sally.
+
+### Removed
+- Remove `go-source` tag from generated pages.
+  This tag is not necessary for <https://pkg.go.dev>.
+- Remove `branch` field under `packages`.
+  This was only necessary for the dropped `go-source` tag.
 
 [Unreleased]: https://github.com/uber-go/sally/compare/v1.3.0...HEAD
 
