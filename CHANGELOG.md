@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [1.4.0]
 ### Added
 - Publish a Docker image to GitHub Container Registry.
   Import it from ghcr.io/uber-go/sally.
@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove `branch` field under `packages`.
   This was only necessary for the dropped `go-source` tag.
 
-[Unreleased]: https://github.com/uber-go/sally/compare/v1.3.0...HEAD
+[1.4.0]: https://github.com/uber-go/sally/compare/v1.3.0...v1.4.0
 
 ## [1.3.0]
 ### Added
