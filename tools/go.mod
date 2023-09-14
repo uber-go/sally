@@ -2,7 +2,7 @@ module go.uber.org/sally/tools
 
 require (
 	github.com/mgechev/revive v1.3.2
-	honnef.co/go/tools v0.4.3
+	honnef.co/go/tools v0.4.6
 )
 
 require (
@@ -19,9 +19,9 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20230522175609-2e198f4a06a1 // indirect
-	golang.org/x/mod v0.10.0 // indirect
-	golang.org/x/sys v0.8.0 // indirect
-	golang.org/x/tools v0.9.1 // indirect
+	golang.org/x/mod v0.12.0 // indirect
+	golang.org/x/sys v0.11.0 // indirect
+	golang.org/x/tools v0.12.1-0.20230825192346-2191a27a6dc5 // indirect
 )
 
 go 1.19
