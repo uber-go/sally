@@ -168,7 +168,9 @@ func TestPostRejected(t *testing.T) {
 
 			res, err := http.Post(srv.URL+tt.path, "text/plain", strings.NewReader("foo"))
 			require.NoError(t, err)
-			defer res.Body.Close()
+			defer func() {
+				assert.NoError(t, res.Body.Close())
+			}()
 
 			body, err := io.ReadAll(res.Body)
 			require.NoError(t, err)
