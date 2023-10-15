@@ -23,6 +23,10 @@ packages:
     url: go.uberalt.org
     repo: github.com/uber-go/zap
     description: A fast, structured logging library.
+  net/metrics:
+    repo: github.com/yarpc/metrics
+  net/something:
+    repo: github.com/yarpc/something
 
 `
 
@@ -34,6 +38,19 @@ func TestIndex(t *testing.T) {
 	assert.Contains(t, body, "github.com/thriftrw/thriftrw-go")
 	assert.Contains(t, body, "github.com/yarpc/yarpc-go")
 	assert.Contains(t, body, "A fast, structured logging library.")
+	assert.Contains(t, body, "github.com/yarpc/metrics")
+	assert.Contains(t, body, "github.com/yarpc/something")
+}
+
+func TestSubindex(t *testing.T) {
+	rr := CallAndRecord(t, config, "/net")
+	assert.Equal(t, 200, rr.Code)
+
+	body := rr.Body.String()
+	assert.NotContains(t, body, "github.com/thriftrw/thriftrw-go")
+	assert.NotContains(t, body, "github.com/yarpc/yarpc-go")
+	assert.Contains(t, body, "github.com/yarpc/metrics")
+	assert.Contains(t, body, "github.com/yarpc/something")
 }
 
 func TestPackageShouldExist(t *testing.T) {
@@ -55,7 +72,7 @@ func TestPackageShouldExist(t *testing.T) {
 func TestNonExistentPackageShould404(t *testing.T) {
 	rr := CallAndRecord(t, config, "/nonexistent")
 	AssertResponse(t, rr, 404, `
-404 page not found
+no packages found under path: nonexistent
 `)
 }
 
@@ -66,10 +83,10 @@ func TestTrailingSlash(t *testing.T) {
 <html>
     <head>
         <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go">
-        <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc/">
+        <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc">
     </head>
     <body>
-        Nothing to see here. Please <a href="https://pkg.go.dev/go.uber.org/yarpc/">move along</a>.
+        Nothing to see here. Please <a href="https://pkg.go.dev/go.uber.org/yarpc">move along</a>.
     </body>
 </html>
 `)
@@ -161,3 +178,44 @@ func TestPostRejected(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkHandlerDispatch(b *testing.B) {
+	handler := CreateHandler(&Config{
+		URL: "go.uberalt.org",
+		Packages: map[string]PackageConfig{
+			"zap": {
+				Repo: "github.com/uber-go/zap",
+			},
+			"net/metrics": {
+				Repo: "github.com/yarpc/metrics",
+			},
+		},
+	})
+	resw := new(nopResponseWriter)
+
+	tests := []struct {
+		name string
+		path string
+	}{
+		{name: "index", path: "/"},
+		{name: "subindex", path: "/net"},
+		{name: "package", path: "/zap"},
+		{name: "subpackage", path: "/zap/zapcore"},
+	}
+
+	for _, tt := range tests {
+		b.Run(tt.name, func(b *testing.B) {
+			req := httptest.NewRequest("GET", tt.path, nil)
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				handler.ServeHTTP(resw, req)
+			}
+		})
+	}
+}
+
+type nopResponseWriter struct{}
+
+func (nopResponseWriter) Header() http.Header       { return nil }
+func (nopResponseWriter) Write([]byte) (int, error) { return 0, nil }
+func (nopResponseWriter) WriteHeader(int)           {}

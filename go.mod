@@ -1,11 +1,14 @@
 module go.uber.org/sally
 
-go 1.18
+go 1.21
+
+toolchain go1.21.3
 
 require (
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/net v0.15.0
 	gopkg.in/yaml.v3 v3.0.1
+	pgregory.net/rapid v1.1.0
 )
 
 require (
