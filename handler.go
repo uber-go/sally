@@ -1,11 +1,12 @@
 package main
 
 import (
-	"errors"
+	"cmp"
 	"fmt"
 	"html/template"
 	"net/http"
 	"path"
+	"slices"
 	"strings"
 
 	"go.uber.org/sally/templates"
@@ -18,27 +19,22 @@ var (
 		template.New("package.html").Parse(templates.Package))
 )
 
-// Handler handles inbound HTTP requests.
-//
-// It provides the following endpoints:
+// CreateHandler builds a new handler
+// with the provided package configuration.
+// The returned handler provides the following endpoints:
 //
 //	GET /
 //		Index page listing all packages.
 //	GET /<name>
-//		Package page for the given package.
+//	       Package page for the given package.
 //	GET /<dir>
 //		Page listing packages under the given directory,
 //		assuming that there's no package with the given name.
 //	GET /<name>/<subpkg>
 //		Package page for the given subpackage.
-type Handler struct {
-	pkgs pathTree[*sallyPackage]
-}
-
-// CreateHandler builds a new handler
-// with the provided package configuration.
-func CreateHandler(config *Config) *Handler {
-	var pkgs pathTree[*sallyPackage]
+func CreateHandler(config *Config) http.Handler {
+	mux := http.NewServeMux()
+	pkgs := make([]*sallyPackage, 0, len(config.Packages))
 	for name, pkg := range config.Packages {
 		baseURL := config.URL
 		if pkg.URL != "" {
@@ -48,22 +44,43 @@ func CreateHandler(config *Config) *Handler {
 		modulePath := path.Join(baseURL, name)
 		docURL := "https://" + path.Join(config.Godoc.Host, modulePath)
 
-		pkgs.Set(name, &sallyPackage{
+		pkg := &sallyPackage{
+			Name:       name,
 			Desc:       pkg.Desc,
 			ModulePath: modulePath,
 			DocURL:     docURL,
 			GitURL:     pkg.Repo,
-		})
+		}
+		pkgs = append(pkgs, pkg)
+
+		// Double-register so that "/foo"
+		// does not redirect to "/foo/" with a 300.
+		handler := &packageHandler{Pkg: pkg}
+		mux.Handle("/"+name, handler)
+		mux.Handle("/"+name+"/", handler)
 	}
 
-	return &Handler{
-		pkgs: pkgs,
-	}
+	mux.Handle("/", newIndexHandler(pkgs))
+	return requireMethod(http.MethodGet, mux)
 }
 
-var _ http.Handler = (*Handler)(nil)
+func requireMethod(method string, handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != method {
+			http.NotFound(w, r)
+			return
+		}
+
+		handler.ServeHTTP(w, r)
+	})
+}
 
 type sallyPackage struct {
+	// Name of the package.
+	//
+	// This is the part after the base URL.
+	Name string
+
 	// Canonical import path for the package.
 	ModulePath string
 
@@ -77,72 +94,94 @@ type sallyPackage struct {
 	GitURL string
 }
 
-func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if err := h.serveHTTP(w, r); err != nil {
-		if herr := new(httpError); errors.As(err, &herr) {
-			http.Error(w, herr.Message, herr.Code)
-		} else {
-			http.Error(w, err.Error(), 500)
+type indexHandler struct {
+	pkgs []*sallyPackage // sorted by name
+}
+
+var _ http.Handler = (*indexHandler)(nil)
+
+func newIndexHandler(pkgs []*sallyPackage) *indexHandler {
+	slices.SortFunc(pkgs, func(a, b *sallyPackage) int {
+		return cmp.Compare(a.Name, b.Name)
+	})
+
+	return &indexHandler{
+		pkgs: pkgs,
+	}
+}
+
+func (h *indexHandler) rangeOf(path string) (start, end int) {
+	if len(path) == 0 {
+		return 0, len(h.pkgs)
+	}
+
+	// If the packages are sorted by name,
+	// we can scan adjacent packages to find the range of packages
+	// whose name descends from path.
+	start, _ = slices.BinarySearchFunc(h.pkgs, path, func(pkg *sallyPackage, path string) int {
+		return cmp.Compare(pkg.Name, path)
+	})
+
+	for idx := start; idx < len(h.pkgs); idx++ {
+		if !descends(path, h.pkgs[idx].Name) {
+			// End of matching sequences.
+			// The next path is not a descendant of path.
+			return start, idx
 		}
 	}
+
+	// All packages following start are descendants of path.
+	// Return the rest of the packages.
+	return start, len(h.pkgs)
 }
 
-// httpError indicates that an HTTP error occurred.
-//
-// The caller will write the error code and message to the response.
-type httpError struct {
-	Code    int    // HTTP status code
-	Message string // error message
-}
-
-func httpErrorf(code int, format string, args ...interface{}) error {
-	return &httpError{
-		Code:    code,
-		Message: fmt.Sprintf(format, args...),
-	}
-}
-
-func (e *httpError) Error() string {
-	return fmt.Sprintf("status %d: %s", e.Code, e.Message)
-}
-
-// serveHTTP is similar to ServeHTTP, except it returns an error.
-//
-// If it returns an httpError,
-// the caller will write the error code and message to the response.
-func (h *Handler) serveHTTP(w http.ResponseWriter, r *http.Request) error {
-	if r.Method != http.MethodGet {
-		return httpErrorf(http.StatusNotFound, "method %q not allowed", r.Method)
-	}
-
+func (h *indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := strings.TrimPrefix(strings.TrimSuffix(r.URL.Path, "/"), "/")
+	start, end := h.rangeOf(path)
 
-	if pkg, suffix, ok := h.pkgs.Lookup(path); ok {
-		return h.servePackage(w, pkg, suffix)
+	// If start == end, then there are no packages
+	if start == end {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintf(w, "no packages found under path: %v\n", path)
+		return
 	}
-	return h.serveIndex(w, path, h.pkgs.ListByPath(path))
+
+	err := indexTemplate.Execute(w,
+		struct{ Packages []*sallyPackage }{
+			Packages: h.pkgs[start:end],
+		})
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+	}
 }
 
-func (h *Handler) servePackage(w http.ResponseWriter, pkg *sallyPackage, suffix string) error {
-	return packageTemplate.Execute(w,
+type packageHandler struct {
+	Pkg *sallyPackage
+}
+
+var _ http.Handler = (*packageHandler)(nil)
+
+func (h *packageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// Extract the relative path to subpackages, if any.
+	//      "/foo/bar" => "/bar"
+	//      "/foo" => ""
+	relPath := strings.TrimPrefix(r.URL.Path, "/"+h.Pkg.Name)
+
+	err := packageTemplate.Execute(w,
 		struct {
 			ModulePath string
 			GitURL     string
 			DocURL     string
 		}{
-			ModulePath: pkg.ModulePath,
-			GitURL:     pkg.GitURL,
-			DocURL:     pkg.DocURL + suffix,
+			ModulePath: h.Pkg.ModulePath,
+			GitURL:     h.Pkg.GitURL,
+			DocURL:     h.Pkg.DocURL + relPath,
 		})
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+	}
 }
 
-func (h *Handler) serveIndex(w http.ResponseWriter, path string, pkgs []*sallyPackage) error {
-	if len(pkgs) == 0 {
-		return httpErrorf(http.StatusNotFound, "no packages found under path: %s", path)
-	}
-
-	return indexTemplate.Execute(w,
-		struct{ Packages []*sallyPackage }{
-			Packages: pkgs,
-		})
+func descends(from, to string) bool {
+	return to == from || (strings.HasPrefix(to, from) && to[len(from)] == '/')
 }

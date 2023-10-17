@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"sort"
 	"strings"
 	"testing"
 
@@ -83,10 +84,10 @@ func TestTrailingSlash(t *testing.T) {
 <html>
     <head>
         <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go">
-        <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc">
+        <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc/">
     </head>
     <body>
-        Nothing to see here. Please <a href="https://pkg.go.dev/go.uber.org/yarpc">move along</a>.
+        Nothing to see here. Please <a href="https://pkg.go.dev/go.uber.org/yarpc/">move along</a>.
     </body>
 </html>
 `)
@@ -175,6 +176,88 @@ func TestPostRejected(t *testing.T) {
 
 			assert.Equal(t, http.StatusNotFound, res.StatusCode,
 				"expected 404, got:\n%s", string(body))
+		})
+	}
+}
+
+func TestIndexHandler_rangeOf(t *testing.T) {
+	tests := []struct {
+		desc string
+		pkgs []*sallyPackage
+		path string
+		want []string // names
+	}{
+		{
+			desc: "empty",
+			pkgs: []*sallyPackage{
+				{Name: "foo"},
+				{Name: "bar"},
+			},
+			want: []string{"foo", "bar"},
+		},
+		{
+			desc: "single child",
+			pkgs: []*sallyPackage{
+				{Name: "foo/bar"},
+				{Name: "baz"},
+			},
+			path: "foo",
+			want: []string{"foo/bar"},
+		},
+		{
+			desc: "multiple children",
+			pkgs: []*sallyPackage{
+				{Name: "foo/bar"},
+				{Name: "foo/baz"},
+				{Name: "qux"},
+				{Name: "quux/quuz"},
+			},
+			path: "foo",
+			want: []string{"foo/bar", "foo/baz"},
+		},
+		{
+			desc: "to end of list",
+			pkgs: []*sallyPackage{
+				{Name: "a"},
+				{Name: "b"},
+				{Name: "c/d"},
+				{Name: "c/e"},
+			},
+			path: "c",
+			want: []string{"c/d", "c/e"},
+		},
+		{
+			desc: "similar name",
+			pkgs: []*sallyPackage{
+				{Name: "foobar"},
+				{Name: "foo/bar"},
+			},
+			path: "foo",
+			want: []string{"foo/bar"},
+		},
+		{
+			desc: "no match",
+			pkgs: []*sallyPackage{
+				{Name: "foo"},
+				{Name: "bar"},
+			},
+			path: "baz",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			h := newIndexHandler(tt.pkgs)
+			start, end := h.rangeOf(tt.path)
+
+			var got []string
+			for _, pkg := range tt.pkgs[start:end] {
+				got = append(got, pkg.Name)
+			}
+			sort.Strings(got)
+			sort.Strings(tt.want)
+
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
