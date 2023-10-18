@@ -167,16 +167,15 @@ func (h *packageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	//      "/foo" => ""
 	relPath := strings.TrimPrefix(r.URL.Path, "/"+h.Pkg.Name)
 
-	err := packageTemplate.Execute(w,
-		struct {
-			ModulePath string
-			GitURL     string
-			DocURL     string
-		}{
-			ModulePath: h.Pkg.ModulePath,
-			GitURL:     h.Pkg.GitURL,
-			DocURL:     h.Pkg.DocURL + relPath,
-		})
+	err := packageTemplate.Execute(w, struct {
+		ModulePath string
+		GitURL     string
+		DocURL     string
+	}{
+		ModulePath: h.Pkg.ModulePath,
+		GitURL:     h.Pkg.GitURL,
+		DocURL:     h.Pkg.DocURL + relPath,
+	})
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 	}
