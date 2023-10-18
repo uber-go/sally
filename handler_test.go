@@ -254,10 +254,7 @@ func TestIndexHandler_rangeOf(t *testing.T) {
 			for _, pkg := range tt.pkgs[start:end] {
 				got = append(got, pkg.Name)
 			}
-			sort.Strings(got)
-			sort.Strings(tt.want)
-
-			assert.Equal(t, tt.want, got)
+			assert.ElementsMatch(t, tt.want, got)
 		})
 	}
 }
