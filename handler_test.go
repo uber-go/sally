@@ -23,6 +23,10 @@ packages:
     url: go.uberalt.org
     repo: github.com/uber-go/zap
     description: A fast, structured logging library.
+  net/metrics:
+    repo: github.com/yarpc/metrics
+  net/something:
+    repo: github.com/yarpc/something
 
 `
 
@@ -34,6 +38,19 @@ func TestIndex(t *testing.T) {
 	assert.Contains(t, body, "github.com/thriftrw/thriftrw-go")
 	assert.Contains(t, body, "github.com/yarpc/yarpc-go")
 	assert.Contains(t, body, "A fast, structured logging library.")
+	assert.Contains(t, body, "github.com/yarpc/metrics")
+	assert.Contains(t, body, "github.com/yarpc/something")
+}
+
+func TestSubindex(t *testing.T) {
+	rr := CallAndRecord(t, config, "/net")
+	assert.Equal(t, 200, rr.Code)
+
+	body := rr.Body.String()
+	assert.NotContains(t, body, "github.com/thriftrw/thriftrw-go")
+	assert.NotContains(t, body, "github.com/yarpc/yarpc-go")
+	assert.Contains(t, body, "github.com/yarpc/metrics")
+	assert.Contains(t, body, "github.com/yarpc/something")
 }
 
 func TestPackageShouldExist(t *testing.T) {
@@ -55,7 +72,7 @@ func TestPackageShouldExist(t *testing.T) {
 func TestNonExistentPackageShould404(t *testing.T) {
 	rr := CallAndRecord(t, config, "/nonexistent")
 	AssertResponse(t, rr, 404, `
-404 page not found
+no packages found under path: nonexistent
 `)
 }
 
@@ -161,3 +178,123 @@ func TestPostRejected(t *testing.T) {
 		})
 	}
 }
+
+func TestIndexHandler_rangeOf(t *testing.T) {
+	tests := []struct {
+		desc string
+		pkgs []*sallyPackage
+		path string
+		want []string // names
+	}{
+		{
+			desc: "empty",
+			pkgs: []*sallyPackage{
+				{Name: "foo"},
+				{Name: "bar"},
+			},
+			want: []string{"foo", "bar"},
+		},
+		{
+			desc: "single child",
+			pkgs: []*sallyPackage{
+				{Name: "foo/bar"},
+				{Name: "baz"},
+			},
+			path: "foo",
+			want: []string{"foo/bar"},
+		},
+		{
+			desc: "multiple children",
+			pkgs: []*sallyPackage{
+				{Name: "foo/bar"},
+				{Name: "foo/baz"},
+				{Name: "qux"},
+				{Name: "quux/quuz"},
+			},
+			path: "foo",
+			want: []string{"foo/bar", "foo/baz"},
+		},
+		{
+			desc: "to end of list",
+			pkgs: []*sallyPackage{
+				{Name: "a"},
+				{Name: "b"},
+				{Name: "c/d"},
+				{Name: "c/e"},
+			},
+			path: "c",
+			want: []string{"c/d", "c/e"},
+		},
+		{
+			desc: "similar name",
+			pkgs: []*sallyPackage{
+				{Name: "foobar"},
+				{Name: "foo/bar"},
+			},
+			path: "foo",
+			want: []string{"foo/bar"},
+		},
+		{
+			desc: "no match",
+			pkgs: []*sallyPackage{
+				{Name: "foo"},
+				{Name: "bar"},
+			},
+			path: "baz",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			h := newIndexHandler(tt.pkgs)
+			start, end := h.rangeOf(tt.path)
+
+			var got []string
+			for _, pkg := range tt.pkgs[start:end] {
+				got = append(got, pkg.Name)
+			}
+			assert.ElementsMatch(t, tt.want, got)
+		})
+	}
+}
+
+func BenchmarkHandlerDispatch(b *testing.B) {
+	handler := CreateHandler(&Config{
+		URL: "go.uberalt.org",
+		Packages: map[string]PackageConfig{
+			"zap": {
+				Repo: "github.com/uber-go/zap",
+			},
+			"net/metrics": {
+				Repo: "github.com/yarpc/metrics",
+			},
+		},
+	})
+	resw := new(nopResponseWriter)
+
+	tests := []struct {
+		name string
+		path string
+	}{
+		{name: "index", path: "/"},
+		{name: "subindex", path: "/net"},
+		{name: "package", path: "/zap"},
+		{name: "subpackage", path: "/zap/zapcore"},
+	}
+
+	for _, tt := range tests {
+		b.Run(tt.name, func(b *testing.B) {
+			req := httptest.NewRequest("GET", tt.path, nil)
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				handler.ServeHTTP(resw, req)
+			}
+		})
+	}
+}
+
+type nopResponseWriter struct{}
+
+func (nopResponseWriter) Header() http.Header       { return nil }
+func (nopResponseWriter) Write([]byte) (int, error) { return 0, nil }
+func (nopResponseWriter) WriteHeader(int)           {}

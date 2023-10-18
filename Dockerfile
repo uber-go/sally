@@ -2,7 +2,7 @@
 # It does not include a sally configuration.
 # A /sally.yaml file is required for this to run.
 
-FROM golang:1.19-alpine
+FROM golang:1.21-alpine
 
 COPY . /build
 WORKDIR /build
