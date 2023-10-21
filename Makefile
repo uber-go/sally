@@ -1,61 +1,47 @@
-export GOBIN = $(shell pwd)/bin
+# Directory containing the Makefile.
+PROJECT_ROOT = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
+export GOBIN = $(PROJECT_ROOT)/bin
 export PATH := $(GOBIN):$(PATH)
 
 GO_FILES = $(shell find . \
 	   -path '*/.*' -prune -o \
 	   '(' -type f -a -name '*.go' ')' -print)
 
-REVIVE = bin/revive
-STATICCHECK = bin/staticcheck
-TOOLS = $(REVIVE) $(STATICCHECK)
-
 TEST_FLAGS ?= -race
 
 .PHONY: all
-all: lint install test
+all: lint build test
 
 .PHONY: lint
-lint: gofmt revive staticcheck
+lint: golangci-lint tidy-lint
 
-.PHONY: gofmt
-gofmt:
-	$(eval FMT_LOG := $(shell mktemp -t gofmt.XXXXX))
-	@gofmt -e -s -l $(GO_FILES) > $(FMT_LOG) || true
-	@[ ! -s "$(FMT_LOG)" ] || \
-		(echo "gofmt failed. Please reformat the following files:" | \
-		cat - $(FMT_LOG) && false)
-
-.PHONY: staticcheck
-staticcheck: $(STATICCHECK)
-	$(STATICCHECK) ./...
-
-$(STATICCHECK): tools/go.mod
-	cd tools && go install honnef.co/go/tools/cmd/staticcheck
-
-.PHONY: revive
-revive: $(REVIVE)
-	$(REVIVE) -set_exit_status ./...
-
-$(REVIVE): tools/go.mod
-	cd tools && go install github.com/mgechev/revive
-
-.PHONY: install
-install:
+.PHONY: build
+build:
 	go install .
 
 .PHONY: test
 test:
 	go test $(TEST_FLAGS) ./...
 
+.PHONY: build
+run: build
+	sally
+
 .PHONY: cover
 cover:
 	go test $(TEST_FLAGS) -coverprofile=cover.out -covermode=atomic -coverpkg=./... ./...
 	go tool cover -html=cover.out -o cover.html
 
-.PHONY: clean
-clean:
-	rm -rf _tmp
+.PHONY: golangci-lint
+golangci-lint:
+	golangci-lint run
 
-.PHONY: install
-run: install
-	sally
+.PHONY: tidy
+tidy:
+	go mod tidy
+
+.PHONY: tidy-lint
+tidy-lint:
+	go mod tidy
+	git diff --exit-code -- go.mod go.sum
