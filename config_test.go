@@ -16,6 +16,7 @@ packages:
   grpc:
     repo: github.com/grpc/grpc-go
     branch: main
+    vcs: svn
 
 `)
 	defer clean()
@@ -28,8 +29,7 @@ packages:
 
 	pkg, ok := config.Packages["grpc"]
 	assert.True(t, ok)
-
-	assert.Equal(t, pkg, PackageConfig{Repo: "github.com/grpc/grpc-go"})
+	assert.Equal(t, PackageConfig{Repo: "github.com/grpc/grpc-go", VCS: "svn"}, pkg)
 }
 
 func TestParsePackageLevelURL(t *testing.T) {
@@ -83,7 +83,7 @@ packages:
 
 			pkg, ok := config.Packages["grpc"]
 			assert.True(t, ok)
-			assert.Equal(t, PackageConfig{Repo: "github.com/grpc/grpc-go"}, pkg)
+			assert.Equal(t, PackageConfig{Repo: "github.com/grpc/grpc-go", VCS: "git"}, pkg)
 		})
 	}
 }

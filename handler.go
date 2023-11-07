@@ -49,7 +49,8 @@ func CreateHandler(config *Config) http.Handler {
 			Desc:       pkg.Desc,
 			ModulePath: modulePath,
 			DocURL:     docURL,
-			GitURL:     pkg.Repo,
+			VCS:        pkg.VCS,
+			RepoURL:    pkg.Repo,
 		}
 		pkgs = append(pkgs, pkg)
 
@@ -90,8 +91,11 @@ type sallyPackage struct {
 	// URL at which documentation for the package can be found.
 	DocURL string
 
-	// URL at which the Git repository is hosted.
-	GitURL string
+	// Version control system used by the package.
+	VCS string
+
+	// URL at which the repository is hosted.
+	RepoURL string
 }
 
 type indexHandler struct {
@@ -169,11 +173,13 @@ func (h *packageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	err := packageTemplate.Execute(w, struct {
 		ModulePath string
-		GitURL     string
+		VCS        string
+		RepoURL    string
 		DocURL     string
 	}{
 		ModulePath: h.Pkg.ModulePath,
-		GitURL:     h.Pkg.GitURL,
+		VCS:        h.Pkg.VCS,
+		RepoURL:    h.Pkg.RepoURL,
 		DocURL:     h.Pkg.DocURL + relPath,
 	})
 	if err != nil {

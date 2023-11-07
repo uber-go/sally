@@ -46,6 +46,11 @@ type PackageConfig struct {
 	// Defaults to the URL specified in the top-level config.
 	URL string `yaml:"url"`
 
+	// VCS is the version control system of this module.
+	//
+	// Defaults to git.
+	VCS string `yaml:"vcs"`
+
 	// Desc is a plain text description of this module.
 	Desc string `yaml:"description"`
 }
@@ -71,6 +76,15 @@ func Parse(path string) (*Config, error) {
 		host = strings.TrimPrefix(host, "http://")
 		host = strings.TrimSuffix(host, "/")
 		c.Godoc.Host = host
+	}
+
+	// Set default values for the packages.
+	for name, pkg := range c.Packages {
+		if pkg.VCS == "" {
+			pkg.VCS = "git"
+		}
+
+		c.Packages[name] = pkg
 	}
 
 	return &c, err
