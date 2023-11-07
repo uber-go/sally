@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"path/filepath"
 )
 
 func main() {
 	yml := flag.String("yml", "sally.yaml", "yaml file to read config from")
+	tpls := flag.String("templates", "", "directory of .html templates to use")
 	port := flag.Int("port", 8080, "port to listen and serve on")
 	flag.Parse()
 
@@ -18,6 +20,14 @@ func main() {
 	config, err := Parse(*yml)
 	if err != nil {
 		log.Fatalf("Failed to parse %s: %v", *yml, err)
+	}
+
+	if *tpls != "" {
+		log.Printf("Parsing templates at path: %s\n", *tpls)
+		templates, err = templates.ParseGlob(filepath.Join(*tpls, "*.html"))
+		if err != nil {
+			log.Fatalf("Failed to parse templates at %s: %v", *tpls, err)
+		}
 	}
 
 	log.Printf("Creating HTTP handler with config: %v", config)

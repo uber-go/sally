@@ -2,21 +2,20 @@ package main
 
 import (
 	"cmp"
+	"embed"
 	"fmt"
 	"html/template"
 	"net/http"
 	"path"
 	"slices"
 	"strings"
-
-	"go.uber.org/sally/templates"
 )
 
 var (
-	indexTemplate = template.Must(
-		template.New("index.html").Parse(templates.Index))
-	packageTemplate = template.Must(
-		template.New("package.html").Parse(templates.Package))
+	//go:embed templates/*.html
+	templateFiles embed.FS
+
+	templates = template.Must(template.ParseFS(templateFiles, "templates/*.html"))
 )
 
 // CreateHandler builds a new handler
@@ -150,7 +149,7 @@ func (h *indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := indexTemplate.Execute(w,
+	err := templates.ExecuteTemplate(w, "index.html",
 		struct{ Packages []*sallyPackage }{
 			Packages: h.pkgs[start:end],
 		})
@@ -171,7 +170,7 @@ func (h *packageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	//      "/foo" => ""
 	relPath := strings.TrimPrefix(r.URL.Path, "/"+h.Pkg.Name)
 
-	err := packageTemplate.Execute(w, struct {
+	err := templates.ExecuteTemplate(w, "package.html", struct {
 		ModulePath string
 		VCS        string
 		RepoURL    string
