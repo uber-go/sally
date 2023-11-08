@@ -71,6 +71,7 @@ func TestPackageShouldExist(t *testing.T) {
 
 func TestNonExistentPackageShould404(t *testing.T) {
 	rr := CallAndRecord(t, config, "/nonexistent")
+	assert.Equal(t, "no-cache", rr.Header().Get("Cache-Control"))
 	AssertResponse(t, rr, 404, `<!DOCTYPE html>
 <html>
     <head>

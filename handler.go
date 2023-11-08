@@ -184,6 +184,10 @@ func descends(from, to string) bool {
 }
 
 func serveHTML(w http.ResponseWriter, status int, template string, data interface{}) {
+	if status >= 400 {
+		w.Header().Set("Cache-Control", "no-cache")
+	}
+
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(status)
 
