@@ -71,8 +71,17 @@ func TestPackageShouldExist(t *testing.T) {
 
 func TestNonExistentPackageShould404(t *testing.T) {
 	rr := CallAndRecord(t, config, "/nonexistent")
-	AssertResponse(t, rr, 404, `
-no packages found under path: nonexistent
+	AssertResponse(t, rr, 404, `<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+    </head>
+    <body>
+        <div class="container">
+            <p>No packages found under: "nonexistent".</p>
+        </div>
+    </body>
+</html>
 `)
 }
 

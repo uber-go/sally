@@ -3,7 +3,6 @@ package main
 import (
 	"cmp"
 	"embed"
-	"fmt"
 	"html/template"
 	"net/http"
 	"path"
@@ -144,18 +143,15 @@ func (h *indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// If start == end, then there are no packages
 	if start == end {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprintf(w, "no packages found under path: %v\n", path)
+		serveHTML(w, http.StatusNotFound, "404.html", struct{ Path string }{
+			Path: path,
+		})
 		return
 	}
 
-	err := templates.ExecuteTemplate(w, "index.html",
-		struct{ Packages []*sallyPackage }{
-			Packages: h.pkgs[start:end],
-		})
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-	}
+	serveHTML(w, http.StatusOK, "index.html", struct{ Packages []*sallyPackage }{
+		Packages: h.pkgs[start:end],
+	})
 }
 
 type packageHandler struct {
@@ -170,7 +166,7 @@ func (h *packageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	//      "/foo" => ""
 	relPath := strings.TrimPrefix(r.URL.Path, "/"+h.Pkg.Name)
 
-	err := templates.ExecuteTemplate(w, "package.html", struct {
+	serveHTML(w, http.StatusOK, "package.html", struct {
 		ModulePath string
 		VCS        string
 		RepoURL    string
@@ -181,11 +177,21 @@ func (h *packageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		RepoURL:    h.Pkg.RepoURL,
 		DocURL:     h.Pkg.DocURL + relPath,
 	})
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-	}
 }
 
 func descends(from, to string) bool {
 	return to == from || (strings.HasPrefix(to, from) && to[len(from)] == '/')
+}
+
+func serveHTML(w http.ResponseWriter, status int, template string, data interface{}) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(status)
+
+	err := templates.ExecuteTemplate(w, template, data)
+	if err != nil {
+		// The status has already been sent, so we cannot use [http.Error] - otherwise
+		// we'll get a superfluous call warning. The other option is to execute the template
+		// to a temporary buffer, but memory.
+		_, _ = w.Write([]byte(err.Error()))
+	}
 }
