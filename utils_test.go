@@ -16,7 +16,7 @@ import (
 )
 
 // TempFile persists contents and returns the path and a clean func
-func TempFile(t *testing.T, contents string) (path string, clean func()) {
+func TempFile(t *testing.T, contents string) (path string) {
 	content := []byte(contents)
 	tmpfile, err := os.CreateTemp("", "sally-tmp")
 	require.NoError(t, err, "unable to create tmpfile")
@@ -27,14 +27,16 @@ func TempFile(t *testing.T, contents string) (path string, clean func()) {
 	err = tmpfile.Close()
 	require.NoError(t, err, "unable to close tmpfile")
 
-	return tmpfile.Name(), func() {
+	t.Cleanup(func() {
 		_ = os.Remove(tmpfile.Name())
-	}
+	})
+
+	return tmpfile.Name()
 }
 
 // CreateHandlerFromYAML builds the Sally handler from a yaml config string
-func CreateHandlerFromYAML(t *testing.T, templates *template.Template, content string) (handler http.Handler, clean func()) {
-	path, clean := TempFile(t, content)
+func CreateHandlerFromYAML(t *testing.T, templates *template.Template, content string) (handler http.Handler) {
+	path := TempFile(t, content)
 
 	config, err := Parse(path)
 	require.NoError(t, err, "unable to parse path %s", path)
@@ -42,13 +44,12 @@ func CreateHandlerFromYAML(t *testing.T, templates *template.Template, content s
 	handler, err = CreateHandler(config, templates)
 	require.NoError(t, err)
 
-	return handler, clean
+	return handler
 }
 
 // CallAndRecord makes a GET request to the Sally handler and returns a response recorder
 func CallAndRecord(t *testing.T, config string, templates *template.Template, uri string) *httptest.ResponseRecorder {
-	handler, clean := CreateHandlerFromYAML(t, templates, config)
-	defer clean()
+	handler := CreateHandlerFromYAML(t, templates, config)
 
 	req, err := http.NewRequest("GET", uri, nil)
 	require.NoError(t, err, "unable to create request to %s", uri)
