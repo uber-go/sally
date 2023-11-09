@@ -21,6 +21,9 @@ type Config struct {
 
 	// Godoc specifies where to redirect to for documentation.
 	Godoc GodocConfig `yaml:"godoc"`
+
+	// overrides Source value
+	Source string `yaml:"source"`
 }
 
 // GodocConfig is the configuration for the documentation server.
@@ -48,6 +51,9 @@ type PackageConfig struct {
 
 	// Desc is a plain text description of this module.
 	Desc string `yaml:"description"`
+
+	//
+	DefaultBranch string `yaml:"source"`
 }
 
 // Parse takes a path to a yaml file and produces a parsed Config

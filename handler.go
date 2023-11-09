@@ -45,11 +45,12 @@ func CreateHandler(config *Config) http.Handler {
 		docURL := "https://" + path.Join(config.Godoc.Host, modulePath)
 
 		pkg := &sallyPackage{
-			Name:       name,
-			Desc:       pkg.Desc,
-			ModulePath: modulePath,
-			DocURL:     docURL,
-			GitURL:     pkg.Repo,
+			Name:          name,
+			Desc:          pkg.Desc,
+			ModulePath:    modulePath,
+			DocURL:        docURL,
+			GitURL:        pkg.Repo,
+			DefaultBranch: pkg.DefaultBranch,
 		}
 		pkgs = append(pkgs, pkg)
 
@@ -83,6 +84,9 @@ type sallyPackage struct {
 
 	// Canonical import path for the package.
 	ModulePath string
+
+	// Default branch of the Git repository.
+	DefaultBranch string
 
 	// Description of the package, if any.
 	Desc string
@@ -171,10 +175,12 @@ func (h *packageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ModulePath string
 		GitURL     string
 		DocURL     string
+		Branch     string
 	}{
 		ModulePath: h.Pkg.ModulePath,
 		GitURL:     h.Pkg.GitURL,
 		DocURL:     h.Pkg.DocURL + relPath,
+		Branch:     h.DefaultBranch,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), 500)
