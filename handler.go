@@ -2,26 +2,26 @@ package main
 
 import (
 	"cmp"
-	"fmt"
+	"embed"
+	"errors"
 	"html/template"
 	"net/http"
 	"path"
 	"slices"
 	"strings"
-
-	"go.uber.org/sally/templates"
 )
 
 var (
-	indexTemplate = template.Must(
-		template.New("index.html").Parse(templates.Index))
-	packageTemplate = template.Must(
-		template.New("package.html").Parse(templates.Package))
+	//go:embed templates/*.html
+	templateFiles embed.FS
+
+	_templates = template.Must(template.ParseFS(templateFiles, "templates/*.html"))
 )
 
-// CreateHandler builds a new handler
-// with the provided package configuration.
-// The returned handler provides the following endpoints:
+// CreateHandler builds a new handler with the provided package configuration,
+// and templates. The templates object must contain the following: index.html,
+// package.html, and 404.html. The returned handler provides the following
+// endpoints:
 //
 //	GET /
 //		Index page listing all packages.
@@ -32,7 +32,22 @@ var (
 //		assuming that there's no package with the given name.
 //	GET /<name>/<subpkg>
 //		Package page for the given subpackage.
-func CreateHandler(config *Config) http.Handler {
+func CreateHandler(config *Config, templates *template.Template) (http.Handler, error) {
+	indexTemplate := templates.Lookup("index.html")
+	if indexTemplate == nil {
+		return nil, errors.New("template index.html is missing")
+	}
+
+	notFoundTemplate := templates.Lookup("404.html")
+	if notFoundTemplate == nil {
+		return nil, errors.New("template 404.html is missing")
+	}
+
+	packageTemplate := templates.Lookup("package.html")
+	if packageTemplate == nil {
+		return nil, errors.New("template package.html is missing")
+	}
+
 	mux := http.NewServeMux()
 	pkgs := make([]*sallyPackage, 0, len(config.Packages))
 	for name, pkg := range config.Packages {
@@ -56,13 +71,13 @@ func CreateHandler(config *Config) http.Handler {
 
 		// Double-register so that "/foo"
 		// does not redirect to "/foo/" with a 300.
-		handler := &packageHandler{Pkg: pkg}
+		handler := &packageHandler{pkg: pkg, template: packageTemplate}
 		mux.Handle("/"+name, handler)
 		mux.Handle("/"+name+"/", handler)
 	}
 
-	mux.Handle("/", newIndexHandler(pkgs))
-	return requireMethod(http.MethodGet, mux)
+	mux.Handle("/", newIndexHandler(pkgs, indexTemplate, notFoundTemplate))
+	return requireMethod(http.MethodGet, mux), nil
 }
 
 func requireMethod(method string, handler http.Handler) http.Handler {
@@ -99,18 +114,22 @@ type sallyPackage struct {
 }
 
 type indexHandler struct {
-	pkgs []*sallyPackage // sorted by name
+	pkgs             []*sallyPackage // sorted by name
+	indexTemplate    *template.Template
+	notFoundTemplate *template.Template
 }
 
 var _ http.Handler = (*indexHandler)(nil)
 
-func newIndexHandler(pkgs []*sallyPackage) *indexHandler {
+func newIndexHandler(pkgs []*sallyPackage, indexTemplate, notFoundTemplate *template.Template) *indexHandler {
 	slices.SortFunc(pkgs, func(a, b *sallyPackage) int {
 		return cmp.Compare(a.Name, b.Name)
 	})
 
 	return &indexHandler{
-		pkgs: pkgs,
+		pkgs:             pkgs,
+		indexTemplate:    indexTemplate,
+		notFoundTemplate: notFoundTemplate,
 	}
 }
 
@@ -145,22 +164,20 @@ func (h *indexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// If start == end, then there are no packages
 	if start == end {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprintf(w, "no packages found under path: %v\n", path)
+		serveHTML(w, http.StatusNotFound, h.notFoundTemplate, struct{ Path string }{
+			Path: path,
+		})
 		return
 	}
 
-	err := indexTemplate.Execute(w,
-		struct{ Packages []*sallyPackage }{
-			Packages: h.pkgs[start:end],
-		})
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-	}
+	serveHTML(w, http.StatusOK, h.indexTemplate, struct{ Packages []*sallyPackage }{
+		Packages: h.pkgs[start:end],
+	})
 }
 
 type packageHandler struct {
-	Pkg *sallyPackage
+	pkg      *sallyPackage
+	template *template.Template
 }
 
 var _ http.Handler = (*packageHandler)(nil)
@@ -169,24 +186,38 @@ func (h *packageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Extract the relative path to subpackages, if any.
 	//      "/foo/bar" => "/bar"
 	//      "/foo" => ""
-	relPath := strings.TrimPrefix(r.URL.Path, "/"+h.Pkg.Name)
+	relPath := strings.TrimPrefix(r.URL.Path, "/"+h.pkg.Name)
 
-	err := packageTemplate.Execute(w, struct {
+	serveHTML(w, http.StatusOK, h.template, struct {
 		ModulePath string
 		VCS        string
 		RepoURL    string
 		DocURL     string
 	}{
-		ModulePath: h.Pkg.ModulePath,
-		VCS:        h.Pkg.VCS,
-		RepoURL:    h.Pkg.RepoURL,
-		DocURL:     h.Pkg.DocURL + relPath,
+		ModulePath: h.pkg.ModulePath,
+		VCS:        h.pkg.VCS,
+		RepoURL:    h.pkg.RepoURL,
+		DocURL:     h.pkg.DocURL + relPath,
 	})
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-	}
 }
 
 func descends(from, to string) bool {
 	return to == from || (strings.HasPrefix(to, from) && to[len(from)] == '/')
+}
+
+func serveHTML(w http.ResponseWriter, status int, template *template.Template, data interface{}) {
+	if status >= 400 {
+		w.Header().Set("Cache-Control", "no-cache")
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(status)
+
+	err := template.Execute(w, data)
+	if err != nil {
+		// The status has already been sent, so we cannot use [http.Error] - otherwise
+		// we'll get a superfluous call warning. The other option is to execute the template
+		// to a temporary buffer, but memory.
+		_, _ = w.Write([]byte(err.Error()))
+	}
 }

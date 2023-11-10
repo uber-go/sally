@@ -2,9 +2,11 @@ package main
 
 import (
 	"bytes"
+	"html/template"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -14,46 +16,43 @@ import (
 )
 
 // TempFile persists contents and returns the path and a clean func
-func TempFile(t *testing.T, contents string) (path string, clean func()) {
+func TempFile(t *testing.T, contents string) (path string) {
 	content := []byte(contents)
 	tmpfile, err := os.CreateTemp("", "sally-tmp")
-	if err != nil {
-		t.Fatal("Unable to create tmpfile", err)
-	}
+	require.NoError(t, err, "unable to create tmpfile")
 
-	if _, err := tmpfile.Write(content); err != nil {
-		t.Fatal("Unable to write tmpfile", err)
-	}
-	if err := tmpfile.Close(); err != nil {
-		t.Fatal("Unable to close tmpfile", err)
-	}
+	_, err = tmpfile.Write(content)
+	require.NoError(t, err, "unable to write tmpfile")
 
-	return tmpfile.Name(), func() {
+	err = tmpfile.Close()
+	require.NoError(t, err, "unable to close tmpfile")
+
+	t.Cleanup(func() {
 		_ = os.Remove(tmpfile.Name())
-	}
+	})
+
+	return tmpfile.Name()
 }
 
 // CreateHandlerFromYAML builds the Sally handler from a yaml config string
-func CreateHandlerFromYAML(t *testing.T, content string) (handler http.Handler, clean func()) {
-	path, clean := TempFile(t, content)
+func CreateHandlerFromYAML(t *testing.T, templates *template.Template, content string) (handler http.Handler) {
+	path := TempFile(t, content)
 
 	config, err := Parse(path)
-	if err != nil {
-		t.Fatalf("Unable to parse %s: %v", path, err)
-	}
+	require.NoError(t, err, "unable to parse path %s", path)
 
-	return CreateHandler(config), clean
+	handler, err = CreateHandler(config, templates)
+	require.NoError(t, err)
+
+	return handler
 }
 
 // CallAndRecord makes a GET request to the Sally handler and returns a response recorder
-func CallAndRecord(t *testing.T, config string, uri string) *httptest.ResponseRecorder {
-	handler, clean := CreateHandlerFromYAML(t, config)
-	defer clean()
+func CallAndRecord(t *testing.T, config string, templates *template.Template, uri string) *httptest.ResponseRecorder {
+	handler := CreateHandlerFromYAML(t, templates, config)
 
 	req, err := http.NewRequest("GET", uri, nil)
-	if err != nil {
-		t.Fatalf("Unable to create request to %s: %v", uri, err)
-	}
+	require.NoError(t, err, "unable to create request to %s", uri)
 
 	rr := httptest.NewRecorder()
 	handler.ServeHTTP(rr, req)
@@ -65,6 +64,29 @@ func CallAndRecord(t *testing.T, config string, uri string) *httptest.ResponseRe
 func AssertResponse(t *testing.T, rr *httptest.ResponseRecorder, code int, want string) {
 	assert.Equal(t, rr.Code, code)
 	assert.Equal(t, reformatHTML(t, want), reformatHTML(t, rr.Body.String()))
+}
+
+// getTestTemplates returns a [template.Template] object with the default templates,
+// overwritten by the  [overrideTemplates]. If [overrideTemplates] is nil, the returned
+// templates are a clone of the global [_templates].
+func getTestTemplates(tb testing.TB, overrideTemplates map[string]string) *template.Template {
+	if len(overrideTemplates) == 0 {
+		// We must clone! Cloning can only be done before templates are executed. Therefore,
+		// we cannot run some tests without cloning, and then attempt cloning it. It'll panic.
+		templates, err := _templates.Clone()
+		require.NoError(tb, err)
+		return templates
+	}
+
+	templatesDir := tb.TempDir() // This is automatically removed at the end of the test.
+	for name, content := range overrideTemplates {
+		err := os.WriteFile(filepath.Join(templatesDir, name), []byte(content), 0o666)
+		require.NoError(tb, err)
+	}
+
+	templates, err := getCombinedTemplates(templatesDir)
+	require.NoError(tb, err)
+	return templates
 }
 
 func reformatHTML(t *testing.T, s string) string {

@@ -71,3 +71,10 @@ use the `-yml` and `-port` flags.
 ```
 $ sally -yml site.yaml -port 5000
 ```
+
+### Custom Templates
+
+You can provide your own custom templates. For this, create a directory with `.html`
+templates and provide it via the `-templates` flag. You only need to provide the
+templates you want to override. See [templates](./templates/) for the available
+templates.

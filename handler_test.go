@@ -1,6 +1,7 @@
 package main
 
 import (
+	"html/template"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -31,7 +32,7 @@ packages:
 `
 
 func TestIndex(t *testing.T) {
-	rr := CallAndRecord(t, config, "/")
+	rr := CallAndRecord(t, config, getTestTemplates(t, nil), "/")
 	assert.Equal(t, 200, rr.Code)
 
 	body := rr.Body.String()
@@ -43,7 +44,7 @@ func TestIndex(t *testing.T) {
 }
 
 func TestSubindex(t *testing.T) {
-	rr := CallAndRecord(t, config, "/net")
+	rr := CallAndRecord(t, config, getTestTemplates(t, nil), "/net")
 	assert.Equal(t, 200, rr.Code)
 
 	body := rr.Body.String()
@@ -54,7 +55,7 @@ func TestSubindex(t *testing.T) {
 }
 
 func TestPackageShouldExist(t *testing.T) {
-	rr := CallAndRecord(t, config, "/yarpc")
+	rr := CallAndRecord(t, config, getTestTemplates(t, nil), "/yarpc")
 	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
@@ -70,14 +71,24 @@ func TestPackageShouldExist(t *testing.T) {
 }
 
 func TestNonExistentPackageShould404(t *testing.T) {
-	rr := CallAndRecord(t, config, "/nonexistent")
-	AssertResponse(t, rr, 404, `
-no packages found under path: nonexistent
+	rr := CallAndRecord(t, config, getTestTemplates(t, nil), "/nonexistent")
+	assert.Equal(t, "no-cache", rr.Header().Get("Cache-Control"))
+	AssertResponse(t, rr, 404, `<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+    </head>
+    <body>
+        <div class="container">
+            <p>No packages found under: "nonexistent".</p>
+        </div>
+    </body>
+</html>
 `)
 }
 
 func TestTrailingSlash(t *testing.T) {
-	rr := CallAndRecord(t, config, "/yarpc/")
+	rr := CallAndRecord(t, config, getTestTemplates(t, nil), "/yarpc/")
 	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
@@ -93,7 +104,7 @@ func TestTrailingSlash(t *testing.T) {
 }
 
 func TestDeepImports(t *testing.T) {
-	rr := CallAndRecord(t, config, "/yarpc/heeheehee")
+	rr := CallAndRecord(t, config, getTestTemplates(t, nil), "/yarpc/heeheehee")
 	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
@@ -107,7 +118,7 @@ func TestDeepImports(t *testing.T) {
 </html>
 `)
 
-	rr = CallAndRecord(t, config, "/yarpc/heehee/hawhaw")
+	rr = CallAndRecord(t, config, getTestTemplates(t, nil), "/yarpc/heehee/hawhaw")
 	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
@@ -123,7 +134,7 @@ func TestDeepImports(t *testing.T) {
 }
 
 func TestPackageLevelURL(t *testing.T) {
-	rr := CallAndRecord(t, config, "/zap")
+	rr := CallAndRecord(t, config, getTestTemplates(t, nil), "/zap")
 	AssertResponse(t, rr, 200, `
 <!DOCTYPE html>
 <html>
@@ -141,14 +152,15 @@ func TestPackageLevelURL(t *testing.T) {
 func TestPostRejected(t *testing.T) {
 	t.Parallel()
 
-	h := CreateHandler(&Config{
+	h, err := CreateHandler(&Config{
 		URL: "go.uberalt.org",
 		Packages: map[string]PackageConfig{
 			"zap": {
 				Repo: "github.com/uber-go/zap",
 			},
 		},
-	})
+	}, getTestTemplates(t, nil))
+	require.NoError(t, err)
 	srv := httptest.NewServer(h)
 	t.Cleanup(srv.Close)
 
@@ -248,7 +260,8 @@ func TestIndexHandler_rangeOf(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
-			h := newIndexHandler(tt.pkgs)
+			templates := getTestTemplates(t, nil)
+			h := newIndexHandler(tt.pkgs, templates.Lookup("index.html"), templates.Lookup("404.html"))
 			start, end := h.rangeOf(tt.path)
 
 			var got []string
@@ -260,8 +273,56 @@ func TestIndexHandler_rangeOf(t *testing.T) {
 	}
 }
 
+func TestCustomTemplates(t *testing.T) {
+	t.Run("missing", func(t *testing.T) {
+		for _, name := range []string{"index.html", "package.html", "404.html"} {
+			templatesText := map[string]string{
+				"index.html":   "index",
+				"package.html": "package",
+				"404.html":     "404",
+			}
+			delete(templatesText, name)
+
+			templates := template.New("")
+			for tplName, tplText := range templatesText {
+				var err error
+				templates, err = templates.New(tplName).Parse(tplText)
+				require.NoError(t, err)
+			}
+
+			_, err := CreateHandler(&Config{}, templates)
+			require.Error(t, err, name)
+		}
+	})
+
+	t.Run("replace", func(t *testing.T) {
+		templates := getTestTemplates(t, map[string]string{
+			"404.html": "not found: {{ .Path }}",
+		})
+
+		// Overrides 404.html
+		rr := CallAndRecord(t, config, templates, "/blah")
+		require.Equal(t, http.StatusNotFound, rr.Result().StatusCode)
+
+		// But not package.html
+		rr = CallAndRecord(t, config, templates, "/zap")
+		AssertResponse(t, rr, 200, `
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="go-import" content="go.uberalt.org/zap git https://github.com/uber-go/zap">
+        <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uberalt.org/zap">
+    </head>
+    <body>
+        Nothing to see here. Please <a href="https://pkg.go.dev/go.uberalt.org/zap">move along</a>.
+    </body>
+</html>
+`)
+	})
+}
+
 func BenchmarkHandlerDispatch(b *testing.B) {
-	handler := CreateHandler(&Config{
+	handler, err := CreateHandler(&Config{
 		URL: "go.uberalt.org",
 		Packages: map[string]PackageConfig{
 			"zap": {
@@ -271,7 +332,8 @@ func BenchmarkHandlerDispatch(b *testing.B) {
 				Repo: "github.com/yarpc/metrics",
 			},
 		},
-	})
+	}, getTestTemplates(b, nil))
+	require.NoError(b, err)
 	resw := new(nopResponseWriter)
 
 	tests := []struct {
@@ -297,6 +359,6 @@ func BenchmarkHandlerDispatch(b *testing.B) {
 
 type nopResponseWriter struct{}
 
-func (nopResponseWriter) Header() http.Header       { return nil }
+func (nopResponseWriter) Header() http.Header       { return http.Header{} }
 func (nopResponseWriter) Write([]byte) (int, error) { return 0, nil }
 func (nopResponseWriter) WriteHeader(int)           {}

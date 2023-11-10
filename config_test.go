@@ -9,7 +9,7 @@ import (
 )
 
 func TestParse(t *testing.T) {
-	path, clean := TempFile(t, `
+	path := TempFile(t, `
 
 url: google.golang.org
 packages:
@@ -19,7 +19,6 @@ packages:
     vcs: svn
 
 `)
-	defer clean()
 
 	config, err := Parse(path)
 	assert.NoError(t, err)
@@ -33,7 +32,7 @@ packages:
 }
 
 func TestParsePackageLevelURL(t *testing.T) {
-	path, clean := TempFile(t, `
+	path := TempFile(t, `
 
 url: google.golang.org
 packages:
@@ -42,7 +41,6 @@ packages:
     url: go.uber.org
 
 `)
-	defer clean()
 
 	config, err := Parse(path)
 	assert.NoError(t, err)
@@ -65,7 +63,7 @@ func TestParseGodocServer(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.give, func(t *testing.T) {
-			path, clean := TempFile(t, fmt.Sprintf(`
+			path := TempFile(t, fmt.Sprintf(`
 godoc:
   host: %q
 url: google.golang.org
@@ -73,7 +71,6 @@ packages:
   grpc:
     repo: github.com/grpc/grpc-go
 `, tt.give))
-			defer clean()
 
 			config, err := Parse(path)
 			require.NoError(t, err)
