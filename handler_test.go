@@ -274,7 +274,7 @@ func TestIndexHandler_rangeOf(t *testing.T) {
 }
 
 func TestCustomTemplates(t *testing.T) {
-	t.Run("fails to create handler if template is missing", func(t *testing.T) {
+	t.Run("missing", func(t *testing.T) {
 		for _, name := range []string{"index.html", "package.html", "404.html"} {
 			templatesText := map[string]string{
 				"index.html":   "index",
@@ -295,7 +295,7 @@ func TestCustomTemplates(t *testing.T) {
 		}
 	})
 
-	t.Run("only replaces correct templates", func(t *testing.T) {
+	t.Run("replace", func(t *testing.T) {
 		templates := getTestTemplates(t, map[string]string{
 			"404.html": "not found: {{ .Path }}",
 		})
@@ -332,7 +332,7 @@ func BenchmarkHandlerDispatch(b *testing.B) {
 				Repo: "github.com/yarpc/metrics",
 			},
 		},
-	}, template.Must(_templates.Clone()))
+	}, getTestTemplates(b, nil))
 	require.NoError(b, err)
 	resw := new(nopResponseWriter)
 

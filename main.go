@@ -52,6 +52,5 @@ func getCombinedTemplates(dir string) (*template.Template, error) {
 	if err != nil {
 		return nil, err
 	}
-	templates, err = templates.ParseGlob(filepath.Join(dir, "*.html"))
-	return templates, err
+	return templates.ParseGlob(filepath.Join(dir, "*.html"))
 }

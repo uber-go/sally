@@ -69,23 +69,23 @@ func AssertResponse(t *testing.T, rr *httptest.ResponseRecorder, code int, want 
 // getTestTemplates returns a [template.Template] object with the default templates,
 // overwritten by the  [overrideTemplates]. If [overrideTemplates] is nil, the returned
 // templates are a clone of the global [_templates].
-func getTestTemplates(t *testing.T, overrideTemplates map[string]string) *template.Template {
+func getTestTemplates(tb testing.TB, overrideTemplates map[string]string) *template.Template {
 	if len(overrideTemplates) == 0 {
 		// We must clone! Cloning can only be done before templates are executed. Therefore,
 		// we cannot run some tests without cloning, and then attempt cloning it. It'll panic.
 		templates, err := _templates.Clone()
-		require.NoError(t, err)
+		require.NoError(tb, err)
 		return templates
 	}
 
-	templatesDir := t.TempDir() // This is automatically removed at the end of the test.
+	templatesDir := tb.TempDir() // This is automatically removed at the end of the test.
 	for name, content := range overrideTemplates {
 		err := os.WriteFile(filepath.Join(templatesDir, name), []byte(content), 0666)
-		require.NoError(t, err)
+		require.NoError(tb, err)
 	}
 
 	templates, err := getCombinedTemplates(templatesDir)
-	require.NoError(t, err)
+	require.NoError(tb, err)
 	return templates
 }
 
