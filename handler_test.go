@@ -283,14 +283,14 @@ func TestCustomTemplates(t *testing.T) {
 			}
 			delete(templatesText, name)
 
-			var err error
-			var templates *template.Template = template.New("")
+			templates := template.New("")
 			for tplName, tplText := range templatesText {
+				var err error
 				templates, err = templates.New(tplName).Parse(tplText)
 				require.NoError(t, err)
 			}
 
-			_, err = CreateHandler(&Config{}, templates)
+			_, err := CreateHandler(&Config{}, templates)
 			require.Error(t, err, name)
 		}
 	})

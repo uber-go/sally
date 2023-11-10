@@ -80,7 +80,7 @@ func getTestTemplates(tb testing.TB, overrideTemplates map[string]string) *templ
 
 	templatesDir := tb.TempDir() // This is automatically removed at the end of the test.
 	for name, content := range overrideTemplates {
-		err := os.WriteFile(filepath.Join(templatesDir, name), []byte(content), 0666)
+		err := os.WriteFile(filepath.Join(templatesDir, name), []byte(content), 0o666)
 		require.NoError(tb, err)
 	}
 
