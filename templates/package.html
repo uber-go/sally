@@ -3,6 +3,13 @@
     <head>
         <meta name="go-import" content="{{ .ModulePath }} {{ .VCS }} https://{{ .RepoURL }}">
         <meta http-equiv="refresh" content="0; url={{ .DocURL }}">
+        <style>    
+            @media (prefers-color-scheme: dark) {
+                body { background-color: #333; color: #ddd; }
+                a { color: #ddd; }
+                a:visited { color: #bbb; }
+            }
+        </style>
     </head>
     <body>
         Nothing to see here. Please <a href="{{ .DocURL }}">move along</a>.
