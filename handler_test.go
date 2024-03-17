@@ -62,6 +62,13 @@ func TestPackageShouldExist(t *testing.T) {
     <head>
         <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go">
         <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc">
+        <style>
+            @media (prefers-color-scheme: dark) {
+                body { background-color: #333; color: #ddd; }
+                a { color: #ddd; }
+                a:visited { color: #bbb; }
+            }
+        </style>
     </head>
     <body>
         Nothing to see here. Please <a href="https://pkg.go.dev/go.uber.org/yarpc">move along</a>.
@@ -77,6 +84,11 @@ func TestNonExistentPackageShould404(t *testing.T) {
 <html>
     <head>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" />
+        <style>
+            @media (prefers-color-scheme: dark) {
+                body { background-color: #333; color: #ddd; }
+            }
+        </style>
     </head>
     <body>
         <div class="container">
@@ -95,6 +107,13 @@ func TestTrailingSlash(t *testing.T) {
     <head>
         <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go">
         <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc/">
+        <style>
+            @media (prefers-color-scheme: dark) {
+                body { background-color: #333; color: #ddd; }
+                a { color: #ddd; }
+                a:visited { color: #bbb; }
+            }
+        </style>
     </head>
     <body>
         Nothing to see here. Please <a href="https://pkg.go.dev/go.uber.org/yarpc/">move along</a>.
@@ -111,6 +130,13 @@ func TestDeepImports(t *testing.T) {
     <head>
         <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go">
         <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc/heeheehee">
+        <style>
+            @media (prefers-color-scheme: dark) {
+                body { background-color: #333; color: #ddd; }
+                a { color: #ddd; }
+                a:visited { color: #bbb; }
+            }
+        </style>
     </head>
     <body>
         Nothing to see here. Please <a href="https://pkg.go.dev/go.uber.org/yarpc/heeheehee">move along</a>.
@@ -125,6 +151,13 @@ func TestDeepImports(t *testing.T) {
     <head>
         <meta name="go-import" content="go.uber.org/yarpc git https://github.com/yarpc/yarpc-go">
         <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uber.org/yarpc/heehee/hawhaw">
+        <style>
+            @media (prefers-color-scheme: dark) {
+                body { background-color: #333; color: #ddd; }
+                a { color: #ddd; }
+                a:visited { color: #bbb; }
+            }
+        </style>
     </head>
     <body>
         Nothing to see here. Please <a href="https://pkg.go.dev/go.uber.org/yarpc/heehee/hawhaw">move along</a>.
@@ -141,6 +174,13 @@ func TestPackageLevelURL(t *testing.T) {
     <head>
         <meta name="go-import" content="go.uberalt.org/zap git https://github.com/uber-go/zap">
         <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uberalt.org/zap">
+        <style>
+            @media (prefers-color-scheme: dark) {
+                body { background-color: #333; color: #ddd; }
+                a { color: #ddd; }
+                a:visited { color: #bbb; }
+            }
+        </style>
     </head>
     <body>
         Nothing to see here. Please <a href="https://pkg.go.dev/go.uberalt.org/zap">move along</a>.
@@ -312,6 +352,13 @@ func TestCustomTemplates(t *testing.T) {
     <head>
         <meta name="go-import" content="go.uberalt.org/zap git https://github.com/uber-go/zap">
         <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/go.uberalt.org/zap">
+        <style>
+            @media (prefers-color-scheme: dark) {
+                body { background-color: #333; color: #ddd; }
+                a { color: #ddd; }
+                a:visited { color: #bbb; }
+            }
+        </style>
     </head>
     <body>
         Nothing to see here. Please <a href="https://pkg.go.dev/go.uberalt.org/zap">move along</a>.
