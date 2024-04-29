@@ -6,7 +6,7 @@ toolchain go1.21.3
 
 require (
 	github.com/stretchr/testify v1.9.0
-	golang.org/x/net v0.20.0
+	golang.org/x/net v0.24.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
