@@ -20,7 +20,7 @@ jobs:
     - name: Setup Go
       uses: actions/setup-go@v5
       with:
-        go-version: 1.21.x
+        go-version: 1.22.x
         cache: true
 
     - name: Build
@@ -30,7 +30,9 @@ jobs:
       run: make cover
 
     - name: Upload coverage to codecov.io
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   lint:
     name: Lint
@@ -42,14 +44,14 @@ jobs:
     - uses: actions/setup-go@v5
       name: Set up Go
       with:
-        go-version: 1.21.x
+        go-version: 1.22.x
         cache: false  # managed by golangci-lint
 
-    - uses: golangci/golangci-lint-action@v3
+    - uses: golangci/golangci-lint-action@v5
       name: Install golangci-lint
       with:
         version: latest
-        args: --version  # make lint will run the linter
+        args: --help # make lint will run the linter
 
     - run: make lint
       name: Lint
