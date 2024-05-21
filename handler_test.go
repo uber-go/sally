@@ -28,6 +28,10 @@ packages:
     repo: github.com/yarpc/metrics
   net/something:
     repo: github.com/yarpc/something
+  scago:
+    repo: github.com/m5ka/scago
+    doc_url: https://example.org/docs/go-pkg/scago
+    doc_badge: https://img.shields.io/badge/custom_docs-scago-blue?logo=go
 
 `
 
@@ -41,6 +45,7 @@ func TestIndex(t *testing.T) {
 	assert.Contains(t, body, "A fast, structured logging library.")
 	assert.Contains(t, body, "github.com/yarpc/metrics")
 	assert.Contains(t, body, "github.com/yarpc/something")
+	assert.Contains(t, body, "github.com/m5ka/scago")
 }
 
 func TestSubindex(t *testing.T) {
@@ -49,6 +54,7 @@ func TestSubindex(t *testing.T) {
 
 	body := rr.Body.String()
 	assert.NotContains(t, body, "github.com/thriftrw/thriftrw-go")
+	assert.NotContains(t, body, "github.com/m5ka/scago")
 	assert.NotContains(t, body, "github.com/yarpc/yarpc-go")
 	assert.Contains(t, body, "github.com/yarpc/metrics")
 	assert.Contains(t, body, "github.com/yarpc/something")
@@ -187,6 +193,41 @@ func TestPackageLevelURL(t *testing.T) {
     </body>
 </html>
 `)
+}
+
+func TestCustomDocURL(t *testing.T) {
+	rr := CallAndRecord(t, config, getTestTemplates(t, nil), "/scago")
+	AssertResponse(t, rr, 200, `
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="go-import" content="go.uber.org/scago git https://github.com/m5ka/scago">
+        <meta http-equiv="refresh" content="0; url=https://example.org/docs/go-pkg/scago">
+        <style>
+            @media (prefers-color-scheme: dark) {
+                body { background-color: #333; color: #ddd; }
+                a { color: #ddd; }
+                a:visited { color: #bbb; }
+            }
+        </style>
+    </head>
+    <body>
+        Nothing to see here. Please <a href="https://example.org/docs/go-pkg/scago">move along</a>.
+    </body>
+</html>
+`)
+}
+
+func TestCustomDocBadge(t *testing.T) {
+	rr := CallAndRecord(t, config, getTestTemplates(t, nil), "/")
+	assert.Equal(t, 200, rr.Code)
+
+	body := rr.Body.String()
+	assert.Contains(t, body, "<img src=\"//pkg.go.dev/badge/go.uber.org/yarpc.svg\" alt=\"Go Reference\" />")
+	assert.Contains(t, body, "<img src=\"//pkg.go.dev/badge/go.uberalt.org/zap.svg\" alt=\"Go Reference\" />")
+	assert.Contains(t, body,
+		"<img src=\"https://img.shields.io/badge/custom_docs-scago-blue?logo=go\" alt=\"Go Reference\" />")
+	assert.NotContains(t, body, "<img src=\"//pkg.go.dev/badge/go.uber.org/scago.svg\" alt=\"Go Reference\" />")
 }
 
 func TestPostRejected(t *testing.T) {

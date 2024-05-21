@@ -53,6 +53,19 @@ type PackageConfig struct {
 
 	// Desc is a plain text description of this module.
 	Desc string `yaml:"description"`
+
+	// DocURL is the link to this module's documentation.
+	//
+	// Defaults to the base doc URL specified in the top-level config
+	// with the package path appended.
+	DocURL string `yaml:"doc_url"`
+
+	// DocBadge is the URL of the badge which links to this module's
+	// documentation.
+	//
+	// Defaults to the pkg.go.dev badge URL with this module's path as a
+	// parameter.
+	DocBadge string `yaml:"doc_badge"`
 }
 
 // Parse takes a path to a yaml file and produces a parsed Config

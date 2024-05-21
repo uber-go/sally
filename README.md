@@ -56,6 +56,18 @@ packages:
     #
     # Defaults to the value of the top-level url field.
     url: example.com
+
+    # Optional URL to the package's documentation.
+    #
+    # Defaults to the documentation site at pkg.go.dev with the package's
+    # module path appended.
+    doc_url: example.com/go-pkg/docs/zap
+
+    # Optional URL to the badge image which appears in the index page.
+    #
+    # Defaults to the badge image at pkg.go.dev, using the package's module
+    # path followed by .svg as the filename.
+    doc_badge: example.com/go-pkg/badge/zap
 ```
 
 Run sally like so:

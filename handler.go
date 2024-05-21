@@ -57,13 +57,23 @@ func CreateHandler(config *Config, templates *template.Template) (http.Handler, 
 			baseURL = pkg.URL
 		}
 		modulePath := path.Join(baseURL, name)
-		docURL := "https://" + path.Join(config.Godoc.Host, modulePath)
+
+		docURL := pkg.DocURL
+		if docURL == "" {
+			docURL = "https://" + path.Join(config.Godoc.Host, modulePath)
+		}
+
+		docBadge := pkg.DocBadge
+		if docBadge == "" {
+			docBadge = "//pkg.go.dev/badge/" + modulePath + ".svg"
+		}
 
 		pkg := &sallyPackage{
 			Name:       name,
 			Desc:       pkg.Desc,
 			ModulePath: modulePath,
 			DocURL:     docURL,
+			DocBadge:   docBadge,
 			VCS:        pkg.VCS,
 			RepoURL:    pkg.Repo,
 		}
@@ -105,6 +115,9 @@ type sallyPackage struct {
 
 	// URL at which documentation for the package can be found.
 	DocURL string
+
+	// URL at which documentation badge image can be found.
+	DocBadge string
 
 	// Version control system used by the package.
 	VCS string
